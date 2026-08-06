@@ -5,9 +5,9 @@ Free tier + Pro tier ($9/mo). FastAPI backend + SvelteKit frontend, Arasaka
 corpo visual design (Cyberpunk 2077). **Analysis only — no trading.**
 
 > ⚠ This is a technical handoff document set. Read `ARCHITECTURE.md` first,
-> then the file relevant to whatever you are working on. The existing
-> `backend/README.md` and `frontend/README.md` contain setup/run details;
-> these docs are the higher-level overview for AI agents continuing work.
+> then the file relevant to whatever you are working on. The `vexarium-backend`
+> and `vexarium-frontend` repos each contain a `README.md` with setup/run
+> details; these docs are the higher-level overview for AI agents continuing work.
 
 ---
 
