@@ -59,17 +59,15 @@ yarn wrangler pages deploy .svelte-kit/cloudflare --project-name=vexarium --bran
 
 ## Container topology
 
-`docker-compose.yml` runs 4 services:
+`docker-compose.yml` runs 3 services:
 
 | Service | Image | Port | Purpose |
 |---------|-------|------|---------|
 | `api` | `./backend` (Dockerfile) | 8000 | FastAPI app |
-| `worker` | `./backend` | — | ARQ worker (`python -m app.worker`) |
 | `postgres` | `postgres:16-alpine` | 5432 | Database (volume `pgdata`) |
-| `redis` | `redis:7-alpine` | 6379 | Cache + rate limit + ARQ broker |
+| `redis` | `redis:7-alpine` | 6379 | Cache + rate limit |
 
-Both `api` and `worker` build the same backend image; the worker overrides
-the command. They read env from `backend/.env`.
+They read env from `backend/.env`.
 
 ## Phase 1 — $0 / free tier (current / live)
 
@@ -98,9 +96,8 @@ Live as of Aug 2026:
 ## Phase 2 — Hetzner VPS (after first paying user)
 
 Migrate to a Hetzner VPS running the full `docker-compose.yml` stack
-(api + worker + postgres + redis). This unlocks:
+(api + postgres + redis). This unlocks:
 - Persistent Redis cache (no cold-start cache loss).
-- The ARQ worker for Pro daily auto-update.
 - Cheaper long-run costs once traffic grows past free-tier limits.
 
 ## Stripe setup (required for Pro to work)

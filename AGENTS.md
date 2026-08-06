@@ -39,10 +39,11 @@ area — it's a cheap fix and prevents a future AI from trusting bad info.
 
 ## Quick facts (memorize these)
 
-- **Stack:** FastAPI (Python 3.11) · PostgreSQL · Redis · ARQ worker ·
+- **Stack:** FastAPI (Python 3.11) · PostgreSQL · Redis ·
   SvelteKit + Tailwind v4 + Svelte 5 (runes) · Lightweight Charts v5 · Yarn Berry 4.17.
-- **Design:** Arasaka corpo — deep black `#0a0a0c`, crimson `#c81e1e`, stark
-  white `#f4f4f5`, 4px angular, UPPERCASE labels. No glassmorphism / neon.
+- **Design:** Amber Health Check — cockpit dark `#0b0e13`, amber `#f59e0b`,
+  near-white `#e8edf5`, 14px radius, health-check vocabulary (grade ring,
+  vitals, plain-language box, pass/watch/fail chips).
 - **AI:** `deepseek-v4-flash:0731` via ollama-cloud (`https://ollama.com/v1`).
 - **Data:** Alpaca paper-trading (daily bars). Indices (SPX) return 404 — expected.
 - **Monetization:** **all 10 indicators are free**; **AI analysis is the only

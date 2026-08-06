@@ -31,11 +31,14 @@ truth.
 
 ## Prompt construction — `services/ai_analyzer.py`
 
-- `SYSTEM_PROMPT`: instructs the model to analyze indicators + optional
-  options/Greeks + news + market context, include the disclaimer, keep under
-  250 words.
+- `SYSTEM_PROMPT`: instructs the model to produce a **structured briefing**
+  with four sections — `## Summary`, `## The Setup`, `## Key Levels`,
+  `## Risks & What to Watch` — referencing specific indicator values and
+  prices, connecting fundamentals to the technical picture, and ending with
+  the disclaimer. under 1000 words.
 - `build_prompt(indicator_results, overall_verdict, options_data=None,
-  news_sentiment=None, news_articles=None, market_data=None)`:
+news_sentiment=None, news_articles=None, market_data=None,
+company_info=None)`:
   - Serializes the indicators, overall verdict, options (if any),
     news sentiment, the **actual news articles** (capped at 8, summary
     truncated to 400 chars), and **market context** into a JSON `context` block.
@@ -43,6 +46,14 @@ truth.
     live price, day change %, bid/ask, prev close, 52-week high/low, YTD change
     %. This lets the AI comment on where the price sits in its recent range —
     not just technicals + news.
+  - **`key_levels`** are derived from the data (`_key_levels`): Bollinger
+    bands, SMA/EMA levels, and the 52-week range become concrete support /
+    resistance prices (nearest 3 each side) so the AI gives actionable levels,
+    not percentages.
+  - **`company_fundamentals`** (from `get_company_info`, free keyless Yahoo)
+    are included when populated (P/E, margins, growth, market cap, sector…)
+    so the AI can connect valuation to the technical setup. Empty/zero fields
+    are filtered out.
   - Passes news **headlines/summaries**, not just the aggregate score, so the
     model can reason about the news itself.
 - `analyze(prompt, skip_ai=False)`:
@@ -52,7 +63,7 @@ truth.
 
 ## The `max_tokens` gotcha (critical)
 
-This model produces a **`reasoning` chain-of-thought** field *before* the
+This model produces a **`reasoning` chain-of-thought** field _before_ the
 `content` field. If `max_tokens` is too small (e.g. 300), the model spends the
 entire budget on `reasoning` and `content` comes back **empty** → the feature
 appears broken ("AI analysis temporarily unavailable").
@@ -66,6 +77,7 @@ budget against that model's reasoning length.
 Request body: `AnalysisRequest` (`{symbol, asset_type, options_enabled}`).
 
 Response:
+
 ```json
 {
   "symbol": "AAPL",
@@ -73,9 +85,19 @@ Response:
   "model": "deepseek-v4-flash:0731",
   "analyzed_at": "2026-08-04T10:00:00+00:00",
   "news_sentiment": { "...": "..." },
-  "news_articles": [ { "headline": "...", "source": "...", "url": "...", "summary": "..." } ],
-  "market": { "price": 303.41, "day_change_pct": -1.72, "bid": 287.82, "ask": 318.75,
-              "prev_close": 308.73, "high_52w": 340.08, "low_52w": 202.92, "ytd_change_pct": 11.96 }
+  "news_articles": [
+    { "headline": "...", "source": "...", "url": "...", "summary": "..." }
+  ],
+  "market": {
+    "price": 303.41,
+    "day_change_pct": -1.72,
+    "bid": 287.82,
+    "ask": 318.75,
+    "prev_close": 308.73,
+    "high_52w": 340.08,
+    "low_52w": 202.92,
+    "ytd_change_pct": 11.96
+  }
 }
 ```
 
@@ -94,5 +116,5 @@ AI results are cached per symbol per day (`ai:{symbol}:{date}`, 24h TTL in
   integrated, not stubbed) or `DEV_FORCE_PRO=true` in dev. A per-user AI
   **daily limit** for the free tier is not yet enforced — today non-Pro users
   are blocked entirely (403) and Pro is unlimited.
-- **Pro auto-update** — the ARQ worker (`app/worker.py`) is where a scheduled
-  daily AI refresh for Pro users would live (not yet implemented).
+- **Pro auto-update** — a scheduled daily AI refresh for Pro users would live
+  in a background worker (not yet implemented).

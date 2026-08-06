@@ -6,8 +6,8 @@ How to work in the FastAPI backend. Start with `ARCHITECTURE.md` and
 ## Stack
 
 FastAPI · Pydantic v2 (pydantic-settings) · pandas · alpaca-py ·
-pandas-ta-remake · slowapi (rate limiting) · cachetools (in-memory cache) ·
-ARQ (worker). Python 3.11.
+pandas-ta-remake · slowapi (rate limiting) · cachetools (in-memory cache).
+Python 3.11.
 
 ## Directory map
 
@@ -20,7 +20,6 @@ app/
 ├── middleware/         # rate_limit, validation, tier_gating, logging
 ├── models/ + repositories/   # persistence (SQLAlchemy-adjacent; in-memory fallback)
 ├── schemas/            # pydantic request/response models
-└── worker.py           # ARQ worker entrypoint
 tests/                  # pytest suite
 ```
 

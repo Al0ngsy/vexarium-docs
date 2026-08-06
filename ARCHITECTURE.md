@@ -17,12 +17,10 @@ FastAPI backend (modular monolith, port 8000)
    │                 news sentiment, options analyzer (Black-Scholes + P/L matrix), strategy engine
    │
    ├── PostgreSQL  ──  users, trades/portfolio (via repositories/)
-   ├── Redis       ──  rate-limit + cache (falls back to in-memory TTL cache)
-   └── ARQ worker  ──  async background jobs (future: daily auto-update)
+   └── Redis       ──  rate-limit + cache (falls back to in-memory TTL cache)
 ```
 
-**Modular monolith:** one FastAPI app + one ARQ worker + Postgres + Redis.
-4 containers total (`docker-compose.yml`). Everything is under
+**Modular monolith:** one FastAPI app + Postgres + Redis. Everything is under
 `backend/app/` — no microservices.
 
 ## Backend layout
@@ -41,7 +39,6 @@ backend/app/
 │   └── indicators/extended.py     # the 5 additional indicators (all free now)
 ├── middleware/         # rate_limit.py validation.py tier_gating.py logging.py
 ├── models/  repositories/  schemas/   # persistence + DTOs
-└── worker.py           # ARQ worker entrypoint
 ```
 
 `main.py` mounts all routers under the `/api/v1` prefix. A router's routes
@@ -65,10 +62,10 @@ frontend/src/
 │   ├── api.ts          # typed fetch wrappers to the backend
 │   ├── types.ts        # shared TypeScript types mirroring backend schemas
 │   ├── storage.ts      # localStorage (recent analyses)
-│   ├── chart-theme.ts  # Arasaka lightweight-charts options
+│   ├── chart-theme.ts  # Amber Health Check lightweight-charts options
 │   ├── verdict.ts      # verdict → color/label/icon maps
 │   └── format.ts       # formatPrice, formatTimeAgo
-└── app.css             # global Arasaka design tokens (CSS vars)
+└── app.css             # global Amber Health Check design tokens (CSS vars)
 ```
 
 ## Request → response flow (analysis)

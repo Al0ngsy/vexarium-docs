@@ -113,7 +113,7 @@ tier gates AI analysis only**. To test the AI paywall locally:
 
 ```bash
 docker compose up --build
-# api :8000, worker, postgres:5432, redis:6379
+# api :8000, postgres:5432, redis:6379
 ```
 
 See `docker-compose.yml` and `DEPLOYMENT.md`.

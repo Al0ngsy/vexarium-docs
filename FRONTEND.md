@@ -33,10 +33,10 @@ src/
 │   ├── api.ts        # typed fetch wrappers (analyze, getAIAnalysis, searchAssets, auth, options)
 │   ├── types.ts      # TS types mirroring backend schemas
 │   ├── storage.ts    # localStorage: recent analyses (key 'vexarium_recent')
-│   ├── chart-theme.ts# Arasaka lightweight-charts options + colors
+│   ├── chart-theme.ts# Amber Health Check lightweight-charts options + colors
 │   ├── verdict.ts    # verdict → color/label/icon
 │   └── format.ts     # formatPrice, formatTimeAgo
-└── app.css           # global Arasaka design tokens (CSS custom properties)
+└── app.css           # global Amber Health Check design tokens (CSS custom properties)
 ```
 
 ## Key commands
@@ -52,17 +52,19 @@ yarn build             # adapter-cloudflare build — gate
 
 **Use `yarn`, never `npm`.**
 
-## Design system (Arasaka corpo)
+## Design system (Amber Health Check)
 
 Defined in `src/app.css` as CSS custom properties:
 `--surface`, `--surface-2`, `--surface-3`, `--panel-border`, `--grid-line`,
 `--foreground`, `--foreground-muted`, `--foreground-subtle`, `--accent-primary`,
 `--accent-white`, `--surface-active`. Base palette:
-- deep black `#0a0a0c` backgrounds
-- crimson `#c81e1e` accents
-- stark white `#f4f4f5` foreground
-- 4px angular radius, UPPERCASE labels with wide letter-spacing
-- opaque panels — **no glassmorphism, no neon street**
+- cockpit dark `#0b0e13` backgrounds with a soft amber radial glow
+- amber `#f59e0b` accents (instrument-light), hover `#fbbf24`
+- near-white `#e8edf5` foreground
+- 14px card radius, pill chips, UPPERCASE micro labels
+- health-check vocabulary: grade ring, vitals row, plain-language box,
+  pass/watch/fail chips (`chip-pass`/`chip-watch`/`chip-fail`), `section-title`
+  with trailing rule, `stat-card` market tiles
 
 Typography: Space Grotesk (display), Inter (body), JetBrains Mono
 (prices/Greeks/P&L) via `@fontsource`.
@@ -79,22 +81,29 @@ Typography: Space Grotesk (display), Inter (body), JetBrains Mono
 - The container div must render **unconditionally** (the chart mounts into
   `bind:this`); a `#if ... && container` gate deadlocks it and shows nothing.
 
-## Data flow (analysis page)
+## Data flow (single-page health check)
 
 1. `+page.svelte` (home): debounced `searchAssets()` → grouped autocomplete
    (STOCK/ETF/INDEX sections, exact symbol match pinned first). Selecting an
    asset sets the symbol + derived `asset_type`. Recent analyses are read from
-   localStorage on mount; **new analyses are recorded by the analysis page on
+   localStorage on mount; **new analyses are recorded by the home page on
    success only** (a failed analysis like SPX is never added).
-2. `analysis/[symbol]/+page.svelte`: `analyze(symbol, assetType)` (returns all
-   10 indicators — free) → renders verdict hero, a rich **"ABOUT {symbol}"
-   company profile** (`CompanyProfile.svelte`: description, identity facts,
-   valuation grid, profitability/growth metrics, 52-week range bar — every
-   metric has a beginner tooltip; free keyless Yahoo+Wikipedia source), news
-   sentiment + headlines dropdown, price chart, indicator cards + mini-charts,
-   save-to-portfolio.
+2. Running a check (`RUN CHECK`, Enter, or deep-link `/?symbol=AAPL`) calls
+   `analyze(symbol, assetType)` (returns all 10 indicators — free) and renders
+   the full health-check report **below the search on the same page**: verdict
+   hero + grade ring, vitals row, plain-language box, price + RSI charts, a rich
+   **"ABOUT {symbol}" company profile** (`CompanyProfile.svelte`: description,
+   identity facts, valuation grid, profitability/growth metrics, 52-week range
+   bar — every metric has a beginner tooltip; free keyless Yahoo+Wikipedia
+   source), news sentiment + headlines dropdown, **THE CHECKS** table with
+   pass/watch/fail chips, and save-to-portfolio.
    The **AI panel is Pro-gated**: shows a 🔒 PRO lock for non-Pro users and a
    "RUN AI ANALYSIS" button only when the logged-in user's tier is `pro`.
+3. `analysis/[symbol]/+page.svelte` is a **redirect** to `/?symbol=X` (kept so
+   old links/bookmarks still work). Options mode routes to the same page with
+   `/?symbol=X&mode=options`, which renders `OptionsWorkspace.svelte` (the full
+   GUIDED / CHAIN / BUILDER options experience) **below the search on the same
+   page**. `/options/[symbol]` is likewise a redirect to `/?symbol=X&mode=options`.
 
 ## Auth
 
@@ -128,7 +137,7 @@ Typography: Space Grotesk (display), Inter (body), JetBrains Mono
 ## Brand wordmark
 
 The VEXARIUM wordmark is **two-tone**: `VEX` in near-white
-(`var(--foreground)`) and `ARIUM` in crimson (`var(--accent-primary)`), in
+(`var(--foreground)`) and `ARIUM` in amber (`var(--accent-primary)`), in
 both the header (`+layout.svelte`) and the home hero (`+page.svelte`).
 
 ## Recent analyses (localStorage)
