@@ -13,18 +13,18 @@ Health Check visual design (cockpit dark + amber). **Analysis only — no tradin
 
 ## Document map
 
-| File | When to read it |
-|------|-----------------|
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | **Start here.** System topology, components, data flow. |
-| [BACKEND.md](./BACKEND.md) | Working on the FastAPI backend. |
-| [FRONTEND.md](./FRONTEND.md) | Working on the SvelteKit frontend. |
-| [API.md](./API.md) | Need the exact request/response shape of an endpoint. |
-| [DATA_AND_INDICATORS.md](./DATA_AND_INDICATORS.md) | Data sources, caching, indicator registry, asset types. |
-| [AI_ANALYSIS.md](./AI_ANALYSIS.md) | The AI pipeline, prompts, token budget, news feed. |
+| File                                               | When to read it                                                                                                                     |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| [ARCHITECTURE.md](./ARCHITECTURE.md)               | **Start here.** System topology, components, data flow.                                                                             |
+| [BACKEND.md](./BACKEND.md)                         | Working on the FastAPI backend.                                                                                                     |
+| [FRONTEND.md](./FRONTEND.md)                       | Working on the SvelteKit frontend.                                                                                                  |
+| [API.md](./API.md)                                 | Need the exact request/response shape of an endpoint.                                                                               |
+| [DATA_AND_INDICATORS.md](./DATA_AND_INDICATORS.md) | Data sources, caching, indicator registry, asset types.                                                                             |
+| [AI_ANALYSIS.md](./AI_ANALYSIS.md)                 | The AI pipeline, prompts, token budget, news feed.                                                                                  |
 | [OPTIONS_PAGE_REWORK.md](./OPTIONS_PAGE_REWORK.md) | **Implemented options-page rework** (Aug 2026): Alpaca options capabilities audit + beginner-first page design + phased build plan. |
-| [ENVIRONMENT.md](./ENVIRONMENT.md) | Env vars, setup, PYTHONPATH gotcha, dev tools. |
-| [DEPLOYMENT.md](./DEPLOYMENT.md) | Docker, free-tier plan, Render/Neon, Hetzner migration. |
-| [CONVENTIONS.md](./CONVENTIONS.md) | Coding conventions and non-obvious gotchas. |
+| [ENVIRONMENT.md](./ENVIRONMENT.md)                 | Env vars, setup, PYTHONPATH gotcha, dev tools.                                                                                      |
+| [DEPLOYMENT.md](./DEPLOYMENT.md)                   | Docker, free-tier plan, Render/Neon, Hetzner migration.                                                                             |
+| [CONVENTIONS.md](./CONVENTIONS.md)                 | Coding conventions and non-obvious gotchas.                                                                                         |
 
 ---
 
@@ -40,7 +40,7 @@ Health Check visual design (cockpit dark + amber). **Analysis only — no tradin
 - **Data:** Alpaca (paper trading keys) for daily OHLCV bars, quotes, news,
   options chains/Greeks.
 - **Monetization:** **everything is free today** — all 10 indicators and the
-  AI SECOND OPINION (per-IP 10 req/min + 24h per-symbol AI cache). Stripe is
+  AI ANALYSIS (per-IP 10 req/min + 24h per-symbol AI cache). Stripe is
   fully integrated (checkout + webhook) and ready for a future Pro tier;
   nothing is gated right now. Daily auto-update is a future Pro feature.
 - **Auth:** minimal JWT login/register UI (backend + frontend) so Pro users

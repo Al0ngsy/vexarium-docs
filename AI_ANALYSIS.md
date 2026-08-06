@@ -16,7 +16,7 @@ Abuse protection is two-layered:
   (`ai:{symbol}:{date}`, 24h TTL), so repeat views are served from cache and
   never hit the LLM. The LLM runs at most once per symbol per day.
 
-The frontend auto-runs the AI SECOND OPINION after every health check; the
+The frontend auto-runs the AI ANALYSIS after every health check; the
 section is collapsible like the others.
 
 ## Provider
