@@ -26,7 +26,7 @@ Rate limits are applied per-endpoint (free 30/min, pro 200/min).
 |--------|------|------|-------|
 | POST | `/api/v1/analysis` | `AnalysisRequest` | Returns **all 10 indicators** (indicators are free). Returns `AnalysisResponse`. |
 | POST | `/api/v1/analysis/extended` | `AnalysisRequest` | Pro-gated but returns the same 10 indicators (kept for compat; indicators are no longer split). |
-| POST | `/api/v1/analysis/ai` | `AnalysisRequest` | Runs LLM on indicators + news. **Pro-only — 403 for free/anonymous users.** Free users get a **preview** for **featured symbols** (`FEATURED_SYMBOLS` in config: AAPL, MSFT, TSLA, SPY, NVDA, AMZN, GOOGL, META) — the result is cached per-symbol-per-day and flagged `is_preview: true` as a conversion teaser. |
+| POST | `/api/v1/analysis/ai` | `AnalysisRequest` | Runs LLM on indicators + news + fundamentals. **Free for everyone** — no token/tier gating. **Per-IP rate limit 10/min** (`RATE_LIMIT_AI`); result **cached per-symbol-per-day** (`ai:{symbol}:{date}`, 24h TTL) so repeat views never hit the LLM. |
 | POST | `/api/v1/analysis/options-strategies` | `{symbol, strike}` | **Pro-only.** LLM explains the recommended options strategy for a symbol near a given strike (decision-impacting, no free preview). |
 
 `AnalysisRequest`:

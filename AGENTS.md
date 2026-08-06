@@ -46,9 +46,11 @@ area — it's a cheap fix and prevents a future AI from trusting bad info.
   vitals, plain-language box, pass/watch/fail chips).
 - **AI:** `deepseek-v4-flash:0731` via ollama-cloud (`https://ollama.com/v1`).
 - **Data:** Alpaca paper-trading (daily bars). Indices (SPX) return 404 — expected.
-- **Monetization:** **all 10 indicators are free**; **AI analysis is the only
-  Pro feature** (`POST /analysis/ai` → 403 for free). `DEV_FORCE_PRO=true` in
-  dev bypasses tier checks; never in production.
+- **Monetization:** **all 10 indicators are free**; **AI analysis is free for
+  everyone** (per-IP 10 req/min + 24h per-symbol cache; `POST /analysis/ai` is
+  open, no 403). `DEV_FORCE_PRO=true` in dev bypasses tier checks; never in
+  production. Stripe billing exists for a future Pro tier but nothing is gated
+  today.
 - **Auth:** minimal JWT login/register (backend + frontend). Auth state lives in
   `frontend/src/lib/auth.svelte.ts` (rune store — must keep the `.svelte.ts`
   extension for SSR; a plain `.ts` throws `$state is not defined`).

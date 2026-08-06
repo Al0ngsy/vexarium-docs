@@ -144,7 +144,7 @@ both the header (`+layout.svelte`) and the home hero (`+page.svelte`).
 
 - `storage.ts`: `getRecentAnalyses()`, `addRecentAnalysis()`. Dedupes by
   symbol, newest first, cap 10. Key `vexarium_recent`.
-- This is a **local** feature (not the pay feature). Daily auto-update is a
+- This is a **local** feature (not a pay feature). Daily auto-update is a
   future Pro feature.
 
 ## Gotchas

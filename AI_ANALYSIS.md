@@ -5,16 +5,18 @@ How the AI analysis feature works, its prompt, token budget, and known quirks.
 ## Overview
 
 `POST /api/v1/analysis/ai` (`backend/app/api/ai.py`) runs a DeepSeek model
-against the technical indicators + news for a symbol and returns a
-natural-language recommendation. **AI analysis is gated behind the Pro tier**:
-an anonymous/free caller gets **403** for most symbols. Exception: **featured
-symbols** (AAPL, MSFT, TSLA, SPY, NVDA, AMZN, GOOGL, META) get a **free AI
-preview** as a conversion teaser — the result is cached per-symbol-per-day and
-flagged `is_preview: true` in the response. The frontend shows a "🔒 PRO" lock
-panel for non-Pro users on non-featured symbols, a green "FREE PREVIEW" badge +
-upgrade prompt on featured ones, and the RUN button only for Pro users (or
-featured-symbol previews). Log in / register via the header's "LOGIN / SIGN UP"
-button (a real Pro user's token unlocks it).
+against the technical indicators + news + fundamentals for a symbol and
+returns a natural-language recommendation. **AI is free for everyone** — no
+token, tier, or featured-symbol gating (`is_preview` is always `false`).
+Abuse protection is two-layered:
+- **Per-IP rate limit:** `RATE_LIMIT_AI` (default **10 requests/minute/IP**,
+  `config.py`) — tightened from the old 200/min Pro limit.
+- **Heavy caching:** the result is cached per-symbol-per-day in Redis
+  (`ai:{symbol}:{date}`, 24h TTL), so repeat views are served from cache and
+  never hit the LLM. The LLM runs at most once per symbol per day.
+
+The frontend auto-runs the AI SECOND OPINION after every health check; the
+section is collapsible like the others.
 
 ## Provider
 

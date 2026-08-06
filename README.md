@@ -39,10 +39,10 @@ Health Check visual design (cockpit dark + amber). **Analysis only — no tradin
   `https://ollama.com/v1`). Summarizes indicator verdicts + news sentiment.
 - **Data:** Alpaca (paper trading keys) for daily OHLCV bars, quotes, news,
   options chains/Greeks.
-- **Monetization:** **all 10 indicators are free**; **AI analysis and the
-  option "chance of profit" estimate are Pro features** (free tier 30 req/min,
-  Pro 200 req/min). **Stripe is fully integrated** (checkout + webhook).
-  Daily auto-update is a future Pro feature.
+- **Monetization:** **everything is free today** — all 10 indicators and the
+  AI SECOND OPINION (per-IP 10 req/min + 24h per-symbol AI cache). Stripe is
+  fully integrated (checkout + webhook) and ready for a future Pro tier;
+  nothing is gated right now. Daily auto-update is a future Pro feature.
 - **Auth:** minimal JWT login/register UI (backend + frontend) so Pro users
   can unlock AI. In dev, `DEV_FORCE_PRO=true` bypasses tier checks.
 - **Tests:** backend `177 passed`. Frontend gates: `yarn check`

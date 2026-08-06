@@ -74,7 +74,6 @@ yarn build                 # adapter-cloudflare build
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Stripe billing. Webhook endpoint must point at `<backend>/api/v1/billing/webhook`. |
 | `STRIPE_PRICE_ID` | Pro subscription Price ID from the Stripe dashboard. |
 | `STRIPE_SUCCESS_URL` / `STRIPE_CANCEL_URL` | Stripe Checkout redirect URLs (set to the prod frontend, e.g. `https://vexarium.pages.dev/pricing?...`). Defaults to localhost. |
-| `FEATURED_SYMBOLS` | Comma-separated symbols that get a **free AI preview** for free users (conversion teaser). Default: `AAPL,MSFT,TSLA,SPY,NVDA,AMZN,GOOGL,META`. |
 | `CORS_ORIGINS=http://localhost:5173` | Allowed origins, comma-separated. |
 
 ### Local Postgres + Redis
