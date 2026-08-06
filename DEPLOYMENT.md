@@ -1,44 +1,32 @@
 # VEXARIUM — Deployment
 
-How VEXARIUM is (or will be) deployed. Start at $0, upgrade after first paying
-user.
+How VEXARIUM is deployed. Start at $0, upgrade after first paying user.
 
-## Repo topology (split mirrors)
+## Repo topology (3 standalone repos)
 
-The **monorepo `Al0ngsy/vexarium` is the source of truth**. Backend and
-frontend are mirrored to their own repos via `git subtree split`:
+VEXARIUM is split into **three independent GitHub repos** (no monorepo):
 
-- **`Al0ngsy/vexarium-backend`** — Render **auto-deploys on push to `main`**.
-- **`Al0ngsy/vexarium-frontend`** — mirror for standalone use; the live FE
-  deploys via Cloudflare Pages from the monorepo.
+- **`Al0ngsy/vexarium-backend`** — FastAPI backend. **Render auto-deploys on
+  push to `main`**.
+- **`Al0ngsy/vexarium-frontend`** — SvelteKit frontend. Deploys to Cloudflare
+  Pages.
+- **`Al0ngsy/vexarium-docs`** — documentation (architecture, API, deployment,
+  conventions).
 
-To push code changes to the mirrors (and thus trigger a backend deploy), run
-`./scripts/deploy.sh split` (or `all`). The script splits `backend/` and
-`frontend/` into `split/backend` / `split/frontend` branches and pushes them to
-the mirror repos.
+The former monorepo `Al0ngsy/vexarium` is **archived** (read-only) and no
+longer used.
 
-## Deploying manual changes (runbook)
+## Backend (Render) — `vexarium-api`
 
-The exact commands live in **`scripts/deploy.sh`** (secrets auto-loaded from
-`deploy-secrets.env`). Run it from the repo root:
-
-```bash
-./scripts/deploy.sh          # split+push BE & FE, then trigger BE redeploy
-./scripts/deploy.sh split    # push subtree splits to both mirror repos
-./scripts/deploy.sh fe       # frontend only (Cloudflare Pages)
-./scripts/deploy.sh be       # backend redeploy only (Render)
-./scripts/deploy.sh local    # start local Postgres + Redis (docker compose)
-```
-
-### Backend (Render) — `vexarium-api`
 Render **auto-deploys from `Al0ngsy/vexarium-backend` `main`** on push. To
 deploy backend changes:
 
 ```bash
-cd /Users/lqat/Project/vexarium
+cd <vexarium-backend checkout>
 git add -A && git commit -m "change" && git push origin main
-./scripts/deploy.sh split    # pushes the backend subtree -> triggers Render
 ```
+
+Render picks up the push and rebuilds automatically.
 
 **Env-var changes do NOT auto-redeploy.** After changing a Render env var,
 trigger a manual deploy:
@@ -48,11 +36,12 @@ curl -X POST "https://api.render.com/v1/services/srv-d9p51ovlk1mc73ad1t3g/deploy
   -H "Authorization: Bearer $RENDER_API_KEY" -H "Accept: application/json"
 ```
 
-### Frontend (Cloudflare Pages) — `vexarium.pages.dev`
+## Frontend (Cloudflare Pages) — `vexarium.pages.dev`
+
 Manual deploy (build with the prod API URL, then push to Pages):
 
 ```bash
-cd frontend
+cd <vexarium-frontend checkout>
 export CLOUDFLARE_API_TOKEN="$CLOUDFLARE_API_TOKEN"   # from deploy-secrets.env
 export CLOUDFLARE_ACCOUNT_ID="6df45854487d44b5a40cf98b3309904e"
 export VITE_API_URL="https://vexarium-api.onrender.com"
@@ -60,12 +49,13 @@ yarn build
 yarn wrangler pages deploy .svelte-kit/cloudflare --project-name=vexarium --branch=main
 ```
 
-### Redis + Postgres
+## Redis + Postgres
+
 - **Production:** both are **managed** (Upstash Redis, Neon Postgres) — nothing
   to deploy. The backend points at them via `REDIS_URL` / `DATABASE_URL` env
   vars on Render.
-- **Local dev:** `./scripts/deploy.sh local` (or `docker compose up -d`) starts
-  Postgres on 5432 + Redis on 6379.
+- **Local dev:** `docker compose up -d` starts Postgres on 5432 + Redis on
+  6379.
 
 ## Container topology
 
@@ -85,8 +75,7 @@ the command. They read env from `backend/.env`.
 
 Live as of Aug 2026:
 - **Backend** → Render free web service `vexarium-api` at `https://vexarium-api.onrender.com`
-  (region **frankfurt**), auto-deploys from **`Al0ngsy/vexarium-backend`** `main`
-  (pushed via `./scripts/deploy.sh split` from the monorepo).
+  (region **frankfurt**), auto-deploys from **`Al0ngsy/vexarium-backend`** `main`.
 - **Postgres** → **Neon** free tier, project **in Frankfurt (`aws-eu-central-1`)**.
 - **Redis** → **Upstash** free (`rediss://...`).
 - **Frontend** → **Cloudflare Pages** `vexarium` at `https://vexarium.pages.dev`
