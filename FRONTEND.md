@@ -95,10 +95,12 @@ Typography: Space Grotesk (display), Inter (body), JetBrains Mono
    **"ABOUT {symbol}" company profile** (`CompanyProfile.svelte`: description,
    identity facts, valuation grid, profitability/growth metrics, 52-week range
    bar — every metric has a beginner tooltip; free keyless Yahoo+Wikipedia
-   source), news sentiment + headlines dropdown, **THE CHECKS** table with
+   source), news sentiment + headlines dropdown, **TECHNICALS** table with
    pass/watch/fail chips, and save-to-portfolio.
-   The **AI panel is Pro-gated**: shows a 🔒 PRO lock for non-Pro users and a
-   "RUN AI ANALYSIS" button only when the logged-in user's tier is `pro`.
+   The **AI panel is free for everyone**: auto-runs after each analysis and
+   streams the answer token-by-token (SSE `/ai/stream`); cached answers are
+   replayed with the same progressive effect. Per-IP rate limit + 24h
+   per-symbol cache protect the free tier.
 3. `analysis/[symbol]/+page.svelte` is a **redirect** to `/?symbol=X` (kept so
    old links/bookmarks still work). Options mode routes to the same page with
    `/?symbol=X&mode=options`, which renders `OptionsWorkspace.svelte` (the full
