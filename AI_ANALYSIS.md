@@ -9,6 +9,7 @@ against the technical indicators + news + fundamentals for a symbol and
 returns a natural-language recommendation. **AI is free for everyone** — no
 token, tier, or featured-symbol gating (`is_preview` is always `false`).
 Abuse protection is two-layered:
+
 - **Per-IP rate limit:** `RATE_LIMIT_AI` (default **10 requests/minute/IP**,
   `config.py`) — tightened from the old 200/min Pro limit.
 - **Heavy caching:** the result is cached per-symbol-per-day in Redis
@@ -37,7 +38,7 @@ truth.
   with four sections — `## Summary`, `## The Setup`, `## Key Levels`,
   `## Risks & What to Watch` — referencing specific indicator values and
   prices, connecting fundamentals to the technical picture, and ending with
-  the disclaimer. under 1000 words.
+  the disclaimer.
 - `build_prompt(indicator_results, overall_verdict, options_data=None,
 news_sentiment=None, news_articles=None, market_data=None,
 company_info=None)`:
