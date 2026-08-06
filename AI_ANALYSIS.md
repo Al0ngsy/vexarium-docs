@@ -84,7 +84,7 @@ Response:
 ```json
 {
   "symbol": "AAPL",
-  "analysis": "**Recommendation: HOLD** ... This is not financial advice. AI can make/will make mistakes.",
+  "analysis": "**Recommendation: HOLD** ...\n\n----------------------------------------\n**This is not financial advice. AI can make/will make mistakes.**\n----------------------------------------",
   "model": "deepseek-v4-flash:0731",
   "analyzed_at": "2026-08-04T10:00:00+00:00",
   "news_sentiment": { "...": "..." },
