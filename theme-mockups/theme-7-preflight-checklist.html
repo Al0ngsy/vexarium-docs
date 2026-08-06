@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VEXARIUM — Theme 7: Pre-Flight Checklist</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0e13;          /* cockpit dark */
+    --bg-2:#10141c;
+    --surface:#151a24;
+    --surface-2:#1c2230;
+    --border:#232b3a;
+    --border-strong:#33405a;
+    --text:#e8edf5;
+    --muted:#8b96a8;
+    --subtle:#5c6678;
+    --accent:#f59e0b;      /* amber — instrument light */
+    --accent-2:#fbbf24;
+    --green:#34d399;
+    --red:#f87171;
+    --amber:#fbbf24;
+    --radius:10px;
+    --radius-sm:6px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.55}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  header{position:sticky;top:0;z-index:10;background:rgba(11,14,19,0.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .logo{font-family:'Space Grotesk';font-weight:700;font-size:1.12rem;letter-spacing:.02em;display:flex;align-items:center;gap:9px}
+  .logo .mark{width:22px;height:22px;border-radius:5px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#1a1205;font-size:.68rem;font-weight:800}
+  .logo b{color:var(--text)} .logo span{color:var(--accent)}
+  nav{display:flex;align-items:center;gap:24px}
+  nav a{color:var(--muted);text-decoration:none;font-size:.9rem;font-weight:500;transition:.2s}
+  nav a:hover{color:var(--text)}
+  .btn{background:var(--accent);color:#1a1205;border:none;padding:9px 18px;border-radius:8px;font-weight:700;font-size:.85rem;cursor:pointer}
+  .btn-ghost{background:var(--surface);border:1px solid var(--border-strong);color:var(--text);padding:9px 16px;border-radius:8px;font-weight:500;font-size:.85rem;cursor:pointer}
+  .hero{text-align:center;padding:64px 0 36px}
+  .pill{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-size:.78rem;color:var(--muted);margin-bottom:20px}
+  .pill .live{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+  h1{font-family:'Space Grotesk';font-size:2.8rem;font-weight:700;letter-spacing:-.02em;line-height:1.1;margin-bottom:14px}
+  h1 .accent{color:var(--accent)}
+  .sub{color:var(--muted);font-size:1.05rem;max-width:560px;margin:0 auto 30px}
+  .search{max-width:540px;margin:0 auto;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border-strong);border-radius:10px;padding:8px 8px 8px 18px}
+  .search input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:1rem;font-family:'JetBrains Mono';letter-spacing:.03em}
+  .search input::placeholder{color:var(--subtle)}
+  .search .btn{border-radius:8px}
+  .modes{display:flex;gap:8px;justify-content:center;margin-top:16px}
+  .mode{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:7px 16px;border-radius:999px;font-size:.8rem;cursor:pointer}
+  .mode.on{background:var(--accent);border-color:var(--accent);color:#1a1205;font-weight:600}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:40px 0}
+  .stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+  .stat .k{font-size:.75rem;color:var(--subtle);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+  .stat .v{font-family:'Space Grotesk';font-size:1.5rem;font-weight:700}
+  .stat .d{font-size:.8rem;color:var(--muted);margin-top:4px}
+  .up{color:var(--green)} .down{color:var(--red)}
+  .disclaimer{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);color:var(--amber);border-radius:10px;padding:10px 16px;font-size:.78rem;text-align:center;margin-bottom:20px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+  .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:16px}
+  .verdict .tag{font-size:.72rem;color:var(--subtle);text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px}
+  .verdict .big{font-family:'Space Grotesk';font-size:1.7rem;font-weight:700;color:var(--green)}
+  .verdict .plain{font-size:.88rem;color:var(--muted);margin-top:6px;max-width:360px}
+  /* GO / NO-GO */
+  .gongo{display:flex;align-items:center;gap:16px}
+  .gongo .box{width:88px;height:88px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid}
+  .gongo .box b{font-family:'Space Grotesk';font-size:1.35rem;font-weight:700;letter-spacing:.04em}
+  .gongo .box span{font-size:.62rem;text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+  .gongo .go{background:rgba(52,211,153,0.1);border-color:var(--green);color:var(--green)}
+  .gongo .note{font-size:.8rem;color:var(--muted)}
+  .gongo .note b{color:var(--text)}
+  /* Checklist */
+  .checks{margin-top:18px;display:flex;flex-direction:column;gap:8px}
+  .check{display:flex;align-items:center;gap:14px;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px}
+  .check .icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0}
+  .check .icon.pass{background:rgba(52,211,153,0.15);color:var(--green);border:1px solid rgba(52,211,153,0.4)}
+  .check .icon.warn{background:rgba(251,191,36,0.12);color:var(--amber);border:1px solid rgba(251,191,36,0.4)}
+  .check .icon.fail{background:rgba(248,113,113,0.12);color:var(--red);border:1px solid rgba(248,113,113,0.4)}
+  .check .body{flex:1}
+  .check .name{font-size:.9rem;font-weight:600}
+  .check .desc{font-size:.78rem;color:var(--muted);margin-top:2px}
+  .check .val{font-family:'JetBrains Mono';font-size:.85rem;color:var(--text)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+  .chart{height:150px;border-radius:var(--radius-sm);background:var(--bg-2);border:1px solid var(--border);position:relative;overflow:hidden}
+  .chart svg{position:absolute;inset:0;width:100%;height:100%}
+  .chart .axis{position:absolute;left:12px;top:10px;font-size:.7rem;color:var(--subtle);font-family:'JetBrains Mono'}
+  .section-title{font-family:'Space Grotesk';font-size:1.1rem;font-weight:600;margin:28px 0 14px;display:flex;align-items:center;gap:10px}
+  .section-title .line{flex:1;height:1px;background:var(--border)}
+  footer{border-top:1px solid var(--border);margin-top:60px;padding:28px 0;color:var(--subtle);font-size:.8rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+  footer a{color:var(--muted);text-decoration:none;margin-left:18px}
+</style>
+</head>
+<body>
+<header><div class="wrap nav">
+  <div class="logo"><span class="mark">V</span><b>VEX</b><span>ARIUM</span></div>
+  <nav>
+    <a href="#">Analyze</a><a href="#">Portfolio</a><a href="#">Pricing</a>
+    <button class="btn-ghost">Log in</button><button class="btn">Sign up</button>
+  </nav>
+</div></header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="pill"><span class="live"></span> 10 free checks · AI briefing on Pro</div>
+    <h1>Run the checklist <span class="accent">before you trade.</span></h1>
+    <p class="sub">Ten checks on any stock, ETF or option — trend, momentum, volatility, news. Learn as you go, or go deep.</p>
+    <div class="search">
+      <input placeholder="Enter symbol — e.g. AAPL, SPY, NVDA">
+      <button class="btn">Run checklist</button>
+    </div>
+    <div class="modes"><span class="mode on">Stock / ETF</span><span class="mode">Options</span></div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="k">S&P 500</div><div class="v up">+0.8%</div><div class="d">5,842.10</div></div>
+    <div class="stat"><div class="k">NASDAQ</div><div class="v up">+1.2%</div><div class="d">18,512.40</div></div>
+    <div class="stat"><div class="k">DOW</div><div class="v down">−0.3%</div><div class="d">41,120.90</div></div>
+    <div class="stat"><div class="k">VIX</div><div class="v down">−4.1%</div><div class="d">14.20</div></div>
+  </div>
+
+  <div class="disclaimer">⚠ This is not financial advice. All signals and data are for information only.</div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="verdict">
+        <div class="tag">Pre-flight — AAPL</div>
+        <div class="big">CLEARED FOR TAKEOFF ✓</div>
+        <div class="plain">7 of 10 checks pass. Trend and momentum are green; one caution on overbought conditions.</div>
+      </div>
+      <div class="gongo">
+        <div class="box go"><b>GO</b><span>7/10</span></div>
+        <div class="note"><b>GO / NO-GO</b><br>based on 10 checks<br>1 caution · 1 fail</div>
+      </div>
+    </div>
+    <div class="checks">
+      <div class="check">
+        <div class="icon pass">✓</div>
+        <div class="body"><div class="name">Trend — price vs 200-day average</div><div class="desc">Price is above the long-term average, the trend is up.</div></div>
+        <div class="val">$232.41 &gt; $198.20</div>
+      </div>
+      <div class="check">
+        <div class="icon pass">✓</div>
+        <div class="body"><div class="name">Momentum — RSI(14)</div><div class="desc">Healthy momentum, not yet overbought.</div></div>
+        <div class="val">58.42</div>
+      </div>
+      <div class="check">
+        <div class="icon pass">✓</div>
+        <div class="body"><div class="name">Trend strength — ADX</div><div class="desc">The trend has real strength behind it.</div></div>
+        <div class="val">32.10</div>
+      </div>
+      <div class="check">
+        <div class="icon warn">△</div>
+        <div class="body"><div class="name">Volatility — Bollinger %B</div><div class="desc">Mid-band. Normal volatility, no squeeze.</div></div>
+        <div class="val">0.62</div>
+      </div>
+      <div class="check">
+        <div class="icon fail">✗</div>
+        <div class="body"><div class="name">Momentum — Stochastic</div><div class="desc">Overbought. A short-term pullback is possible — consider waiting for a dip.</div></div>
+        <div class="val">78.90</div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="chart">
+        <div class="axis">AAPL · LAST 120 DAYS</div>
+        <svg viewBox="0 0 500 150" preserveAspectRatio="none">
+          <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f59e0b" stop-opacity="0.25"/><stop offset="1" stop-color="#f59e0b" stop-opacity="0"/></linearGradient></defs>
+          <path d="M0,120 C40,115 60,100 90,105 C120,110 140,80 170,85 C200,90 220,60 250,65 C280,70 300,45 330,50 C360,55 380,30 410,35 C440,40 460,20 500,15 L500,150 L0,150 Z" fill="url(#g)"/>
+          <path d="M0,120 C40,115 60,100 90,105 C120,110 140,80 170,85 C200,90 220,60 250,65 C280,70 300,45 330,50 C360,55 380,30 410,35 C440,40 460,20 500,15" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
+        </svg>
+      </div>
+      <div class="chart">
+        <div class="axis">RSI · MOMENTUM</div>
+        <svg viewBox="0 0 500 150" preserveAspectRatio="none">
+          <path d="M0,90 C50,85 80,60 120,70 C160,80 200,40 240,50 C280,60 320,30 360,45 C400,60 440,25 500,35" fill="none" stroke="#fbbf24" stroke-width="2.5"/>
+          <line x1="0" y1="75" x2="500" y2="75" stroke="#5c6678" stroke-width="1" stroke-dasharray="4 4"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">The AI briefing <span class="line"></span></div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+      <span style="font-size:.8rem;color:var(--muted)">Plain-language read of the checks, in context of the news</span>
+      <button class="btn">Get the briefing</button>
+    </div>
+    <p style="color:var(--muted);font-size:.9rem;line-height:1.7">AAPL is cleared to fly: trend, momentum and volume all check out, and the news flow is supportive. The one item to respect is the overbought stochastic — if you're buying, a small pullback would be a better entry. If you already hold, the checklist says the trend is intact.</p>
+  </div>
+</div>
+
+<footer><div class="wrap" style="display:flex;justify-content:space-between;width:100%">
+  <span>VEXARIUM — informational only, not financial advice</span>
+  <div><a href="#">Impressum</a><a href="#">Disclaimer</a><a href="#">Terms</a><a href="#">Privacy</a></div>
+</div></footer>
+</body>
+</html>
