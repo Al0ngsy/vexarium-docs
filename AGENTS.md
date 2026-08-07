@@ -44,7 +44,7 @@ area — it's a cheap fix and prevents a future AI from trusting bad info.
 - **Design:** Amber Health Check — cockpit dark `#0b0e13`, amber `#f59e0b`,
   near-white `#e8edf5`, 14px radius, health-check vocabulary (grade ring,
   vitals, plain-language box, pass/watch/fail chips).
-- **AI:** `deepseek-v4-flash:0731` via ollama-cloud (`https://ollama.com/v1`).
+- **AI:** `deepseek-v4-flash` via OpenCode Go (`https://opencode.ai/zen/go/v1`).
 - **Data:** Alpaca paper-trading (daily bars) with a **Yahoo Finance fallback**
   for OTC/foreign ADRs outside Alpaca's universe (SMERY, RNMBY, …): daily bars
   (`_fetch_yahoo_bars`) + company profile + **main-listing mapping**

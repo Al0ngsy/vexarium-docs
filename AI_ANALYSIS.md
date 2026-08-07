@@ -7,7 +7,7 @@ How the AI analysis feature works, its prompt, token budget, and known quirks.
 `POST /api/v1/analysis/ai` (`backend/app/api/ai.py`) runs a DeepSeek model
 against the technical indicators + news + fundamentals for a symbol and
 returns a natural-language recommendation. **AI is free for everyone** — no
-token, tier, or featured-symbol gating (`is_preview` is always `false`).
+token, tier, or featured-symbol gating.
 Abuse protection is two-layered:
 
 - **Per-IP rate limit:** `RATE_LIMIT_AI` (default **10 requests/minute/IP**,

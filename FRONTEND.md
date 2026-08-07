@@ -113,10 +113,9 @@ Typography: Space Grotesk (display), Inter (body), JetBrains Mono
   localStorage (`vexarium_token`, `vexarium_user`). `initAuth`, `getToken`,
   `getUser`, `isPro`, `setSession`, `logout`. **Note the `.svelte.ts` suffix —
   runes in a plain `.ts` file are not compiled and break SSR.**
-- `components/AuthModal.svelte`: login/register form wired to
-  `/api/v1/auth/register` and `/api/v1/auth/login`.
-- `routes/+layout.svelte` header: "LOGIN / SIGN UP" button (opens the modal)
-  or a FREE/PRO badge + LOGOUT when signed in.
+- The login UI (AuthModal, header LOGIN/LOGOUT) is currently removed — the
+  backend auth API stays live and `getToken()` still feeds the AI stream;
+  restore the UI from git history when login is re-enabled.
 
 ## Options pages
 

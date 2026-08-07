@@ -25,7 +25,6 @@ Rate limits are applied per-endpoint (free 30/min, pro 200/min).
 | Method | Path | Body | Notes |
 |--------|------|------|-------|
 | POST | `/api/v1/analysis` | `AnalysisRequest` | Returns **all 10 indicators** (indicators are free). Returns `AnalysisResponse`. |
-| POST | `/api/v1/analysis/extended` | `AnalysisRequest` | Pro-gated but returns the same 10 indicators (kept for compat; indicators are no longer split). |
 | POST | `/api/v1/analysis/ai` | `AnalysisRequest` | Runs LLM on indicators + news + fundamentals. **Free for everyone** — no token/tier gating. **Per-IP rate limit 10/min** (`RATE_LIMIT_AI`); result **cached per-symbol-per-day** (`ai:{symbol}:{date}`, 24h TTL) so repeat views never hit the LLM. |
 | POST | `/api/v1/analysis/options-strategies` | `{symbol, strike}` | **Pro-only.** LLM explains the recommended options strategy for a symbol near a given strike (decision-impacting, no free preview). |
 
@@ -34,7 +33,7 @@ Rate limits are applied per-endpoint (free 30/min, pro 200/min).
 { "symbol": "AAPL", "asset_type": "stock", "options_enabled": false }
 ```
 
-`AnalysisResponse` (free & extended; `news_articles` added for the dropdown):
+`AnalysisResponse` (`news_articles` added for the dropdown):
 ```json
 {
   "symbol": "AAPL",
@@ -42,7 +41,7 @@ Rate limits are applied per-endpoint (free 30/min, pro 200/min).
   "current_price": 757.67,
   "analyzed_at": "2026-08-04T10:00:00+00:00",
   "overall": { "overall_verdict": "hold", "score": 0, "indicator_count": 5, "breakdown": [] },
-  "indicators": [ { "name": "RSI(14)", "value": 41.2, "verdict": "hold", "tier": "free" } ],
+  "indicators": [ { "name": "RSI(14)", "value": 41.2, "verdict": "hold" } ],
   "price_series": [ { "t": "2026-01-05", "open": 100, "high": 101, "low": 99, "close": 100.5 } ],
   "indicator_series": [ { "name": "RSI(14)", "kind": "oscillator", "points": [ { "t": "2026-01-05", "v": 41.2 } ] } ],
   "news_sentiment": { "sentiment_score": 0.1, "article_count": 10, "summary": "Recent news sentiment is neutral." },
@@ -74,7 +73,7 @@ results are appended on top (deduped by symbol).
 
 | Method | Path | Notes |
 |--------|------|-------|
-| GET | `/api/v1/options/{symbol}/chain` | **Full option chain** via Alpaca's market-data chain endpoint. Returns per-contract `symbol` (OCC), `strike_price`, `expiration_date`, `type`, `bid`, `ask`, `last_price`, `implied_volatility`, `greeks{delta,gamma,theta,vega,rho}`, plus computed `days_to_expiry`, `intrinsic_value`, `time_value`, `theoretical_value` (Black-Scholes), `spread`, `distance_pct`. `volume`/`open_interest` are `null` (Alpaca's free tier does not provide them — do not fabricate). Response also carries `current_price`, `day_change_pct`, and `delayed: true` (indicative feed). Skips same-day (0 DTE) expiries (they have no greeks). |
+| GET | `/api/v1/options/{symbol}/chain` | **Full option chain** via Alpaca's market-data chain endpoint. Returns per-contract `symbol` (OCC), `strike_price`, `expiration_date`, `type`, `bid`, `ask`, `last_price`, `implied_volatility`, `greeks{delta,gamma,theta,vega,rho}`, plus computed `days_to_expiry`, `intrinsic_value`, `time_value`, `theoretical_value` (Black-Scholes), `spread`, `distance_pct`. Response also carries `current_price`, `day_change_pct`, and `delayed: true` (indicative feed). Skips same-day (0 DTE) expiries (they have no greeks). |
 | GET | `/api/v1/options/{symbol}/payoff` | `?contract_symbol=` OCC code. Parses strike/type/expiry from OCC. |
 | POST | `/api/v1/options/{symbol}/matrix` | `{contract_symbol, range_pct, quantity}` → **P/L matrix** (rows = strikes centered ±range_pct, columns = expiries, cells = Black-Scholes P/L). |
 | GET | `/api/v1/options/{symbol}/value` | `?contract_symbol=&target_price=&target_date=` → **Black-Scholes** estimate of the option's worth if the underlying trades at `target_price`. |
@@ -94,7 +93,7 @@ results are appended on top (deduped by symbol).
 | Method | Path | Notes |
 |--------|------|-------|
 | GET | `/api/v1/strategies/{symbol}/strategies` | `?sentiment=&strike=&expiration_gte=&expiration_lte=`. Strategy selection is driven by **technical indicators** (computed server-side), falling back to the `sentiment` param. |
-| POST | `/api/v1/portfolio/stance` | Compute take-profit/cut-loss stance. |
+| POST | `/api/v1/portfolio/stance` | Compute take-profit/cut-loss stance. `current_price` optional — the server fetches the live quote when omitted (the client only stores entry prices). |
 
 ## Portfolio (trades)
 
@@ -103,7 +102,6 @@ results are appended on top (deduped by symbol).
 | POST | `/api/v1/trades` | `?token=` + body. Create trade. 201. |
 | GET | `/api/v1/trades` | `?token=`. List current user's trades. |
 | DELETE | `/api/v1/trades/{trade_id}` | `?token=`. 204. |
-| POST | `/api/v1/trades/stance` | `?token=`. Batch stance. |
 
 ## Billing (Stripe)
 
