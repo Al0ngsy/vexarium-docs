@@ -29,6 +29,8 @@ Methods you'll use:
 ### What Alpaca can and cannot do (important)
 
 - **Daily bars** work for stocks AND ETFs (e.g. `AAPL`, `SPY`).
+- **OTC / foreign ADRs** (e.g. `SMERY`, `RNMBY`) are NOT in Alpaca's universe —
+  they fall back to **Yahoo Finance daily bars** (see "Data source" note above).
 - **Indices (SPX, NDX, etc.) are NOT in the tradable / bar-data universe.**
   `POST /api/v1/analysis {symbol:"SPX"}` → **404 "No data found"**. This is
   expected, not a bug. Do not try to "fix" it by faking data.
@@ -46,6 +48,8 @@ if `REDIS_URL` is set, otherwise an in-memory `TTLCache`. TTLs:
 | `bars:{symbol}` | 6h | Daily bars change at most once/day. |
 | `quote:{symbol}` | 5s | Seconds during market hours. |
 | `news:{symbol}` | 30 min | |
+| `company:v2:{symbol}` | 12h | Company/ETF profile + fundamentals (see below). |
+| `ysearch:{q}` | 60s | Yahoo search autocomplete results (assets search). |
 | `ai:{symbol}:{date}` | 24h | AI analysis per symbol per day. |
 | `analysis:{symbol}:{date}` (and `analysis:pro:{symbol}:{date}`) | 24h | **Computed analysis result per symbol per day.** |
 
@@ -206,12 +210,20 @@ and fundamentals using free, keyless sources:
   `Apple_Inc.`), with a curated `SYMBOL_WIKI_TITLES` map for tricky ETF names
   (SPY, QQQ, GLD…).
 
-Cached under `company:{symbol}` (Redis or in-memory). **Never raises** — on any
+Cached under `company:v2:{symbol}` (Redis or in-memory). **Never raises** — on any
 fetch failure the missing fields are simply omitted so the UI degrades
 gracefully. Surfaced as `AnalysisResponse.company` and rendered in an "ABOUT
 {symbol}" card (`CompanyProfile.svelte`) with identity facts, a valuation grid,
 profitability/growth metrics and a 52-week position bar — each metric has a
 beginner plain-English tooltip.
+
+**OTC ADR → main listing:** when the symbol's exchange contains "OTC" (e.g.
+`RNMBY`, `SMERY` — foreign ADRs not on Alpaca's feed), `get_company_info`
+also resolves the **primary home-exchange listing** via keyless Yahoo search
+(`find_main_listing`, exchange preference XETRA/GER → FRA → other) and adds
+`main_listing: {symbol, name, exchange}` — e.g. `RNMBY → RHM.DE/XETRA`,
+`SMERY → ENR.DE/XETRA`. The frontend uses it for the "VIEW MAIN LISTING"
+button.
 
 > **Rate-limit note:** Yahoo rate-limits aggressive polling (429). In production
 > the analysis + company info are cached (24h analysis / 12h company), so this

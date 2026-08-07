@@ -51,16 +51,24 @@ Rate limits are applied per-endpoint (free 30/min, pro 200/min).
 }
 ```
 
+`company.main_listing` (only present for **OTC/foreign ADRs** like `RNMBY`,
+`SMERY`): the primary home-exchange listing, resolved keylessly via Yahoo
+search — e.g. `RNMBY → {symbol: "RHM.DE", name: "Rheinmetall AG", exchange:
+"XETRA"}`, `SMERY → {symbol: "ENR.DE", ...}`. The frontend shows a
+"VIEW MAIN LISTING" button when this is present. Cache key `company:v2:{symbol}`
+(12h TTL).
+
 ## Asset search (autocomplete)
 
 | Method | Path | Params | Notes |
 |--------|------|--------|-------|
-| GET | `/api/v1/assets/search` | `?q=APPLE` or `?q=AAPL` (max 60 chars) | Returns `{assets:[{symbol,name,exchange,asset_type}]}`. Matches **symbol prefix, exact symbol, and company name** substring (e.g. "Apple" → AAPL). |
+| GET | `/api/v1/assets/search` | `?q=APPLE` or `?q=AAPL` (max 60 chars) | Returns `{assets:[{symbol,name,exchange,asset_type}]}`. Matches **symbol prefix, exact symbol, and company name** substring (e.g. "Apple" → AAPL), then merges **keyless Yahoo search results** so foreign main listings appear (e.g. "Rheinmetall" → `RHM.DE`/XETRA **before** the OTC ADR `RNMBY`). Yahoo results are cached ~60s (`ysearch:{q}`). |
 
 `asset_type` is `"stock"` or `"etf"`, derived from the asset **name**
 (Alpaca's `asset_class` is always `"us_equity"` and does not distinguish
 ETF vs stock). Indices are NOT returned. The endpoint caches the full
-asset list in memory (~14k symbols) after the first load.
+Alpaca asset list in memory (~14k symbols) after the first load; Yahoo
+results are appended on top (deduped by symbol).
 
 ## Options
 
