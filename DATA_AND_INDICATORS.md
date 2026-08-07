@@ -2,10 +2,20 @@
 
 How market data is fetched, cached, and turned into verdicts.
 
-## Data source: Alpaca
+## Data source: Alpaca (+ Yahoo fallback)
 
-All price data comes from **Alpaca** (paper-trading keys in `backend/.env`).
-The wrapper is `backend/app/services/alpaca_client.py` (`AlpacaClient`).
+Primary price data comes from **Alpaca** (paper-trading keys in
+`backend/.env`). The wrapper is `backend/app/services/alpaca_client.py`
+(`AlpacaClient`).
+
+**OTC / foreign ADRs are NOT on Alpaca's equity feed** (e.g. `SMERY`
+Siemens Energy, `RNMBY` Rheinmetall — both trade on OTC Markets). For those
+symbols Alpaca returns no bars, and `get_stock_bars` silently falls back to
+**Yahoo Finance v8 chart** (keyless, same Windows-UA/query1→query2 strategy as
+`company_info.py` — see `_fetch_yahoo_bars` in `alpaca_client.py`). The
+fallback only fires when Alpaca returns zero bars or rejects the symbol, and
+its result is cached under the same `bars:{symbol}` key. Symbols neither
+source knows still return 404.
 
 Methods you'll use:
 - `get_stock_bars(symbol, days=365)` → pandas DataFrame of **daily** OHLCV.
@@ -210,5 +220,10 @@ beginner plain-English tooltip.
 
 ## Data sources
 
-- **Alpaca (paper trading)** supplies all market data: daily OHLCV bars, quotes,
-  news sentiment, and option chains/Greeks. No other external data feed is used.
+- **Alpaca (paper trading)** supplies most market data: daily OHLCV bars,
+  quotes, news sentiment, and option chains/Greeks.
+- **Yahoo Finance v8 chart (keyless)** is the **fallback for daily bars of
+  symbols outside Alpaca's universe** — OTC/foreign ADRs like `SMERY`,
+  `RNMBY` (no bars from Alpaca). See `_fetch_yahoo_bars` in
+  `alpaca_client.py`. Company profiles use Yahoo too (`company_info.py`).
+- No other external data feed is used.
