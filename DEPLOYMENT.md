@@ -4,14 +4,14 @@ How VEXARIUM is deployed. Start at $0, upgrade after first paying user.
 
 ## Repo topology (3 standalone repos)
 
-VEXARIUM is split into **three independent GitHub repos** (no monorepo):
+VEXARIUM is split into **three independent GitHub repos**, checked out
+side-by-side in one local folder (`~/Project/vexarium/`):
 
 - **`Al0ngsy/vexarium-backend`** — FastAPI backend. **Render auto-deploys on
   push to `main`**.
 - **`Al0ngsy/vexarium-frontend`** — SvelteKit frontend. Deploys to Cloudflare
   Pages.
-- **`Al0ngsy/vexarium-docs`** — documentation (architecture, API, deployment,
-  conventions).
+- **`Al0ngsy/vexarium-docs`** — documentation (this folder).
 
 The former monorepo `Al0ngsy/vexarium` is **archived** (read-only) and no
 longer used.
@@ -22,7 +22,7 @@ Render **auto-deploys from `Al0ngsy/vexarium-backend` `main`** on push. To
 deploy backend changes:
 
 ```bash
-cd <vexarium-backend checkout>
+cd backend
 git add -A && git commit -m "change" && git push origin main
 ```
 
@@ -33,41 +33,33 @@ trigger a manual deploy:
 
 ```bash
 curl -X POST "https://api.render.com/v1/services/srv-d9p51ovlk1mc73ad1t3g/deploys" \
-  -H "Authorization: Bearer $RENDER_API_KEY" -H "Accept: application/json"
+  -H "Authorization: Bearer ***" -H "Accept: application/json"
 ```
 
 ## Frontend (Cloudflare Pages) — `vexarium.pages.dev`
 
-Manual deploy (build with the prod API URL, then push to Pages):
+One-command deploy (wrangler **direct upload** — the Pages project is not
+git-connected):
 
 ```bash
-cd <vexarium-frontend checkout>
-export CLOUDFLARE_API_TOKEN="$CLOUDFLARE_API_TOKEN"   # from deploy-secrets.env
-export CLOUDFLARE_ACCOUNT_ID="6df45854487d44b5a40cf98b3309904e"
-export VITE_API_URL="https://vexarium-api.onrender.com"
-yarn build
-yarn wrangler pages deploy .svelte-kit/cloudflare --project-name=vexarium --branch=main
+cd frontend
+yarn deploy          # → bash scripts/deploy.sh
 ```
+
+`scripts/deploy.sh` builds with the production API URL, then uploads via
+wrangler. Secrets are read from, in order: environment variables
+(`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`) →
+`../deploy-secrets.env` → `./.env`. Overridable: `VITE_API_URL` (default
+`https://vexarium-api.onrender.com`) and `CF_PROJECT` (default `vexarium`).
 
 ## Redis + Postgres
 
-- **Production:** both are **managed** (Upstash Redis, Neon Postgres) — nothing
-  to deploy. The backend points at them via `REDIS_URL` / `DATABASE_URL` env
-  vars on Render.
-- **Local dev:** `docker compose up -d` starts Postgres on 5432 + Redis on
-  6379.
-
-## Container topology
-
-`docker-compose.yml` runs 3 services:
-
-| Service | Image | Port | Purpose |
-|---------|-------|------|---------|
-| `api` | `./backend` (Dockerfile) | 8000 | FastAPI app |
-| `postgres` | `postgres:16-alpine` | 5432 | Database (volume `pgdata`) |
-| `redis` | `redis:7-alpine` | 6379 | Cache + rate limit |
-
-They read env from `backend/.env`.
+- **Production:** both are **managed** (Upstash Redis, Neon Postgres) —
+  nothing to deploy. The backend points at them via `REDIS_URL` /
+  `DATABASE_URL` env vars on Render.
+- **Local dev:** start Postgres (5432) + Redis (6379) yourself (see
+  `ENVIRONMENT.md`); the app also runs without them (in-memory fallbacks).
+  There is **no docker-compose.yml** in the repo anymore.
 
 ## Phase 1 — $0 / free tier (current / live)
 
@@ -87,18 +79,22 @@ Live as of Aug 2026:
   needs `pkg_resources`, removed in 3.14 / setuptools≥81 → pin `setuptools<81`).
 - Neon DATABASE_URL has `channel_binding`/`sslmode` query params that **crash
   asyncpg** → `db._asyncpg_safe_url()` strips them and sets TLS via
-  `connect_args={"ssl":"require"}`.
+  `connect_args={"ssl":"require"}`. Local Postgres (no TLS) needs
+  `?ssl=disable` in the URL.
 - Setting env vars via the Render API does **not** auto-redeploy — trigger
   `POST /services/{id}/deploys` after changing env vars.
 - Stripe v15 returns `StripeObject` (no `.get()`) → webhook handler converts
   via `stripe_service._to_dict()`.
+- The `-free` LLM model IDs only work on `https://opencode.ai/zen/v1` — the
+  `/go/v1` path rejects them (401). Set `LLM_BASE_URL` accordingly on Render.
 
 ## Phase 2 — Hetzner VPS (after first paying user)
 
-Migrate to a Hetzner VPS running the full `docker-compose.yml` stack
-(api + postgres + redis). This unlocks:
-- Persistent Redis cache (no cold-start cache loss).
-- Cheaper long-run costs once traffic grows past free-tier limits.
+Optional migration to a Hetzner VPS running the backend Dockerfile + Postgres
++ Redis. This unlocks persistent Redis cache (no cold-start cache loss) and
+cheaper long-run costs once traffic grows past free-tier limits. **Not started
+yet.** The `frontend/Dockerfile` (self-host path) is optional infrastructure
+for this migration; the primary FE target remains Cloudflare Pages.
 
 ## Stripe setup (required for Pro to work)
 
@@ -119,19 +115,14 @@ keys and set them on Render. The code path is identical.
 
 ## Backend Dockerfile
 
-The backend `Dockerfile` installs deps, then runs uvicorn. Set `ENV`/env vars
-via `env_file` or build args. **Do not bake secrets into the image.**
-
-## Frontend Cloudflare Pages
-
-- Build: `yarn build` (adapter-cloudflare).
-- The SvelteKit `load`/client code calls the backend at `http://localhost:5173`
-  locally; set the production API base URL via env when deploying.
+The backend `Dockerfile` installs deps, then runs uvicorn. Set env vars via
+the host (Render env vars / VPS `.env`). **Do not bake secrets into the image.**
 
 ## Environment secrets
 
 `.env` is gitignored and never committed. In production use the host's env /
-platform secrets (Render env vars, Cloudflare secrets, VPS `.env`).
+platform secrets (Render env vars, Cloudflare secrets, `deploy-secrets.env`
+for local deploys).
 
 ## Production safety
 
@@ -139,9 +130,6 @@ platform secrets (Render env vars, Cloudflare secrets, VPS `.env`).
   (see `config.py::_check_production_jwt`).
 - Set `DEV_FORCE_PRO=false` (it must never be true in production).
 - Always a financial disclaimer; this is analysis-only, no trading.
-
-## CI/CD
-
-`.github/workflows/ci.yml` runs backend tests + frontend `yarn install
---immutable` + `yarn check`. Extend it for deploy steps when you pick a
-platform.
+- There are **no CI workflows** in the repos today — deploy gates are
+  `pytest` (backend) and `yarn check` + `yarn build` (frontend), run locally
+  or by whoever pushes.

@@ -1,8 +1,9 @@
 # VEXARIUM — Project Documentation
 
-**VEXARIUM** is a web-based **trading signal & options analysis** SaaS tool.
-Free tier + Pro tier ($9/mo). FastAPI backend + SvelteKit frontend, Amber
-Health Check visual design (cockpit dark + amber). **Analysis only — no trading.**
+**VEXARIUM** is a web-based **before-you-buy/sell decision-support** tool for
+stocks, ETFs, indices and options. Free tier + Pro tier ($9/mo). FastAPI
+backend + SvelteKit frontend, Professional Dashboard V2 visual design.
+**Analysis only — no trading.**
 
 > ⚠ This is a technical handoff document set. Read `ARCHITECTURE.md` first,
 > then the file relevant to whatever you are working on. The `vexarium-backend`
@@ -18,34 +19,40 @@ Health Check visual design (cockpit dark + amber). **Analysis only — no tradin
 | [ARCHITECTURE.md](./ARCHITECTURE.md)               | **Start here.** System topology, components, data flow.                                                                             |
 | [BACKEND.md](./BACKEND.md)                         | Working on the FastAPI backend.                                                                                                     |
 | [FRONTEND.md](./FRONTEND.md)                       | Working on the SvelteKit frontend.                                                                                                  |
-| [API.md](./API.md)                                 | Need the exact request/response shape of an endpoint.                                                                               |
+| [API.md](./API.md)                                 | Need the exact request/response shape of an endpoint. **Auto-generated** from the OpenAPI schema (`docs/scripts/generate_api_md.py`) — editorial notes live in `docs/scripts/api_notes.md`. |
 | [DATA_AND_INDICATORS.md](./DATA_AND_INDICATORS.md) | Data sources, caching, indicator registry, asset types.                                                                             |
-| [AI_ANALYSIS.md](./AI_ANALYSIS.md)                 | The AI pipeline, prompts, token budget, news feed.                                                                                  |
+| [AI_ANALYSIS.md](./AI_ANALYSIS.md)                 | The AI pipeline, prompts, model chain, streaming, news feed.                                                                        |
 | [OPTIONS_PAGE_REWORK.md](./OPTIONS_PAGE_REWORK.md) | **Implemented options-page rework** (Aug 2026): Alpaca options capabilities audit + beginner-first page design + phased build plan. |
 | [ENVIRONMENT.md](./ENVIRONMENT.md)                 | Env vars, setup, PYTHONPATH gotcha, dev tools.                                                                                      |
-| [DEPLOYMENT.md](./DEPLOYMENT.md)                   | Docker, free-tier plan, Render/Neon, Hetzner migration.                                                                             |
+| [DEPLOYMENT.md](./DEPLOYMENT.md)                   | Render/Neon/Upstash/Cloudflare Pages, Stripe, the deploy script.                                                                    |
 | [CONVENTIONS.md](./CONVENTIONS.md)                 | Coding conventions and non-obvious gotchas.                                                                                         |
 
 ---
 
 ## Quick facts (one-paragraph orientation)
 
-- **Stack:** FastAPI (Python 3.11) · PostgreSQL · Redis ·
-  SvelteKit + Tailwind v4 + Svelte 5 (runes) · TradingView Lightweight Charts v5.
-- **Brand / design:** VEXARIUM, Amber Health Check — cockpit dark `#0b0e13`,
-  amber `#f59e0b`, near-white `#e8edf5`, 14px radius, health-check vocabulary
-  (grade ring, vitals, plain-language box, pass/watch/fail chips).
-- **AI:** `deepseek-v4-flash:0731` via ollama-cloud (OpenAI-compatible at
-  `https://ollama.com/v1`). Summarizes indicator verdicts + news sentiment.
-- **Data:** Alpaca (paper trading keys) for daily OHLCV bars, quotes, news,
-  options chains/Greeks.
-- **Monetization:** **everything is free today** — all 10 indicators and the
-  AI ANALYSIS (per-IP 10 req/min + 24h per-symbol AI cache). Stripe is
-  fully integrated (checkout + webhook) and ready for a future Pro tier;
-  nothing is gated right now. Daily auto-update is a future Pro feature.
-- **Auth:** minimal JWT login/register UI (backend + frontend) so Pro users
-  can unlock AI. In dev, `DEV_FORCE_PRO=true` bypasses tier checks.
-- **Tests:** backend `177 passed`. Frontend gates: `yarn check`
+- **Stack:** FastAPI (Python 3.11) · PostgreSQL (SQLAlchemy async + asyncpg) ·
+  Redis · SvelteKit + Tailwind v4 + Svelte 5 (runes) ·
+  TradingView Lightweight Charts v5 · gridstack.js · Yarn Berry 4.17.
+- **Brand / design:** VEXARIUM, Professional Dashboard V2 — flat solid dark
+  `#0a0c10`, blue accent `#3b82f6`, sentence case, 8–10px radius,
+  full-width 12-column widget grid (gridstack), no metaphor vocabulary.
+- **AI:** `deepseek-v4-flash-free` via OpenCode Zen (`https://opencode.ai/zen/v1`,
+  OpenAI-compatible, free tier) with a comma-separated **fallback model chain**
+  (`LLM_FALLBACK_MODELS`) tried in order on rate-limit/outage.
+- **Data:** Alpaca (paper keys) for OHLCV bars (daily + intraday timeframes),
+  quotes, news, options chains/Greeks. **Yahoo Finance** fallback for bars of
+  OTC/foreign ADRs + company fundamentals; **stockanalysis.com** as a
+  fundamentals fallback; **Wikipedia** for descriptions.
+- **Monetization:** **everything is free today** — all 16 indicators, the AI
+  analysis (per-IP 10 req/min + 24h per-symbol cache, streamed via SSE), and
+  options analytics. The **only Pro-gated endpoint is the options
+  chance-of-profit estimate** (`/options/{symbol}/chance`). Stripe is fully
+  integrated (checkout + webhook) and ready for a future Pro tier.
+- **Auth:** minimal self-built JWT auth (register/login/me). The frontend
+  **login UI is currently removed** (getToken still feeds the AI stream); the
+  backend auth API stays live. In dev, `DEV_FORCE_PRO=true` bypasses tier checks.
+- **Tests:** backend `248 passed`. Frontend gates: `yarn check`
   (0 errors) + `yarn build`.
 
 Read the per-topic docs for the details that will actually let you keep going

@@ -5,15 +5,23 @@
 > Options Chain and OptionStrat's builder, but **only using data Alpaca
 > actually provides**. Everything must be explained for a complete newbie.
 >
-> **STATUS: IMPLEMENTED (Aug 2026).** All of Phases 1–3 below are built and
-> verified against the live Alpaca API:
+> **STATUS: IMPLEMENTED — SUPERSEDED BY WIDGET GRID (Aug 2026).** All of
+> Phases 1–3 below are built and verified against the live Alpaca API:
 > - Backend: `AlpacaClient.get_option_chain()` (market-data chain, indicative
 >   feed), enriched `/chain` response (bid/ask/last/IV/greeks + computed DTE/
 >   intrinsic/time/theoretical/spread/distance), Pro-gated `GET /options/{sym}/chance`.
 > - Frontend: `OptionsChain.svelte` (two-sided chain), `OptionGlossary.svelte`,
 >   and the tabbed **GUIDED / CHAIN / BUILDER** options page with an EXPERIENCE
 >   toggle and a DELAYED badge.
-> - Gates: 167 backend tests pass; `yarn check` 0 errors; `yarn build` clean.
+> - **Aug 7 rework:** the tabbed options page was replaced by a **gridstack
+>   widget grid** at `routes/options/[symbol]` (`OPTIONS_WIDGETS` in
+>   `lib/layout.svelte.ts`; per-widget components: OptionsChainWidget, PayoffWidget,
+>   GreeksWidget, ProbabilityWidget, MatrixWidget, StrategyWidget, WatchlistWidget).
+>   The monolithic `OptionsWorkspace.svelte` (this doc's GUIDED/CHAIN/BUILDER
+>   implementation), plus `ContractPicker.svelte`, `OptionGlossary.svelte` and
+>   `VerdictBadge.svelte`, were **deleted** (zero importers). Widget layout
+>   persists per-view in localStorage.
+> - Gates: 248 backend tests pass; `yarn check` 0 errors; `yarn build` clean.
 > This document records the analysis that drove the implementation.
 
 ---
