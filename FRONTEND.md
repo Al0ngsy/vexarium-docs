@@ -167,6 +167,9 @@ blue accent, in the `TopBar` header.
 - `storage.ts`: `getRecentAnalyses()`, `addRecentAnalysis()`, saved trades,
   watchlist, consent. Dedupes by symbol, newest first, cap 10. Key
   `vexarium_recent`.
+- `SymbolStrip` has a **watchlist toggle** (☆ Add to watchlist / ★ Watchlisted)
+  that saves the current symbol (with company name) to `vexarium_watchlist`;
+  the landing page renders a WATCHLIST section from the same key.
 - These are **local** features (not pay features). Daily auto-update is a
   future Pro feature.
 
