@@ -40,7 +40,9 @@ per-IP; slowapi's in-memory storage, not Redis).
   **loaded independently of `/analysis`** — the news widget and market gauge
   fetch them on their own so they never block the slow report. `fear-greed`
   proxies CNN's unofficial dataviz endpoint (needs the page-cookie handshake;
-  plain requests get HTTP 418) and returns `{}` on failure.
+  plain requests get HTTP 418) and returns `{}` on failure. It also returns a
+  `history` array (last ~90 daily scores) which the widget renders as a
+  sparkline.
 - News is **VADER**-scored per headline; `news_articles[].sentiment` carries
   each article's score. The stock feed merges Alpaca + Google + Finnhub
   `/company-news`, deduped (identical, or same-day ≥85% similar) with a
