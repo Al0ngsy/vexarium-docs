@@ -21,7 +21,7 @@ backend + SvelteKit frontend, Professional Dashboard V2 visual design.
 | [FRONTEND.md](./FRONTEND.md)                       | Working on the SvelteKit frontend.                                                                                                  |
 | [API.md](./API.md)                                 | Need the exact request/response shape of an endpoint. **Auto-generated** from the OpenAPI schema (`docs/scripts/generate_api_md.py`) — editorial notes live in `docs/scripts/api_notes.md`. |
 | [DATA_AND_INDICATORS.md](./DATA_AND_INDICATORS.md) | Data sources, caching, indicator registry, asset types.                                                                             |
-| [AI_ANALYSIS.md](./AI_ANALYSIS.md)                 | The AI pipeline, prompts, model chain, streaming, news feed.                                                                        |
+| [AI_ANALYSIS.md](./AI_ANALYSIS.md)                 | The AI pipeline, prompts, provider/model, streaming, news feed & sentiment. |
 | [OPTIONS_PAGE_REWORK.md](./OPTIONS_PAGE_REWORK.md) | **Implemented options-page rework** (Aug 2026): Alpaca options capabilities audit + beginner-first page design + phased build plan. |
 | [ENVIRONMENT.md](./ENVIRONMENT.md)                 | Env vars, setup, PYTHONPATH gotcha, dev tools.                                                                                      |
 | [DEPLOYMENT.md](./DEPLOYMENT.md)                   | Render/Neon/Upstash/Cloudflare Pages, Stripe, the deploy script.                                                                    |
@@ -37,9 +37,9 @@ backend + SvelteKit frontend, Professional Dashboard V2 visual design.
 - **Brand / design:** VEXARIUM, Professional Dashboard V2 — flat solid dark
   `#0a0c10`, blue accent `#3b82f6`, sentence case, 8–10px radius,
   full-width 12-column widget grid (gridstack), no metaphor vocabulary.
-- **AI:** `deepseek-v4-flash-free` via OpenCode Zen (`https://opencode.ai/zen/v1`,
-  OpenAI-compatible, free tier) with a comma-separated **fallback model chain**
-  (`LLM_FALLBACK_MODELS`) tried in order on rate-limit/outage.
+- **AI:** `mimo-v2.5` via **OpenCode Go** (`https://opencode.ai/zen/go/v1`,
+  OpenAI-compatible, subscription — ~$10/mo). **Single model — free-tier
+  fallback chain removed.** Usage limits: https://opencode.ai/docs/go/#usage-limits.
 - **Data:** Alpaca (paper keys) for OHLCV bars (daily + intraday timeframes),
   quotes, news, options chains/Greeks. **Yahoo Finance** fallback for bars of
   OTC/foreign ADRs + company fundamentals; **stockanalysis.com** as a
@@ -52,7 +52,7 @@ backend + SvelteKit frontend, Professional Dashboard V2 visual design.
 - **Auth:** minimal self-built JWT auth (register/login/me). The frontend
   **login UI is currently removed** (getToken still feeds the AI stream); the
   backend auth API stays live. In dev, `DEV_FORCE_PRO=true` bypasses tier checks.
-- **Tests:** backend `248 passed`. Frontend gates: `yarn check`
+- **Tests:** backend `268 passed`. Frontend gates: `yarn check`
   (0 errors) + `yarn build`.
 
 Read the per-topic docs for the details that will actually let you keep going

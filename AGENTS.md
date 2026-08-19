@@ -45,17 +45,26 @@ area — it's a cheap fix and prevents a future AI from trusting bad info.
 - **Design:** Professional Dashboard V2 — flat solid dark `#0a0c10`,
   blue accent `#3b82f6`, sentence case, 8–10px radius, full-width 12-col
   widget grid. No amber, no radial glows, no UPPERCASE metaphor labels.
-- **AI:** `deepseek-v4-flash-free` via OpenCode Zen (`https://opencode.ai/zen/v1`,
-  free tier; **`/zen/go/v1` rejects `-free` model IDs — use `/zen/v1`**).
-  Fallback chain from `LLM_FALLBACK_MODELS` (comma-separated free IDs).
+- **AI:** `mimo-v2.5` via **OpenCode Go** (`https://opencode.ai/zen/go/v1`,
+  OpenAI-compatible, subscription — ~$10/mo). **Single model, no fallback
+  chain** (the free tiers were removed). Usage limits:
+  https://opencode.ai/docs/go/#usage-limits.
+  (`muse-spark-1.2-contributor` has higher limits but is geo-blocked in DE.)
 - **Data:** Alpaca paper-trading (bars for daily + intraday timeframes,
   quotes, news, option chains) with **Yahoo Finance fallback** for
   OTC/foreign ADRs outside Alpaca's universe (SMERY, RNMBY, …): daily bars
   (`_fetch_yahoo_bars`) + company profile + **main-listing mapping**
   (RNMBY → RHM.DE/XETRA, surfaced as `company.main_listing`, FE shows a
   "VIEW MAIN LISTING" button). Fundamentals fall back to stockanalysis.com.
+  **Intraday bars (1m–4h) come from Twelve Data first** (`TWELVEDATA_API_KEY`,
+  real-time, no 15-min delay — Alpaca/Yahoo historical bars lag 15 min by
+  design).
   Assets search merges keyless Yahoo results, so "Rheinmetall" → RHM.DE
   before RNMBY. Indices (SPX) return 404 — expected.
+- **News:** stock feed = Alpaca + Google + Finnhub `/company-news`, deduped
+  + source-capped (max 2 per outlet) and **VADER**-scored per article
+  (`news_articles[].sentiment`). Broad market = **market-news** and
+  **Fear & Greed** widgets, fetched independently of `/analysis`.
 - **Monetization:** **all 16 indicators are free**; **AI analysis is free for
   everyone** (per-IP 10 req/min + 24h per-symbol cache; `POST /analysis/ai`
   and `/analysis/ai/stream` are open, no 403). The **only Pro-gated endpoint
@@ -79,7 +88,7 @@ area — it's a cheap fix and prevents a future AI from trusting bad info.
   `env -u PYTHONPATH .venv/bin/python ...` or `env -u PYTHONPATH .venv/bin/uvicorn ...`.
 - **Yarn, never npm** for frontend commands: `yarn dev`, `yarn check`, `yarn build`.
 - **Backend tests:** `cd backend && env -u PYTHONPATH .venv/bin/python -m pytest tests/ -q`
-  (expect **248 passed**).
+  (expect **268 passed**).
 - **Frontend gates:** `yarn check` (0 errors) and `yarn build` (adapter-cloudflare).
 
 ## Workflow expectation

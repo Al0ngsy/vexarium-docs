@@ -6,11 +6,11 @@ known quirks.
 ## Overview
 
 `POST /api/v1/analysis/ai` and `POST /api/v1/analysis/ai/stream`
-(`backend/app/api/ai.py`) run a DeepSeek model against the technical
-indicators + news + fundamentals for a symbol and return a natural-language
-briefing. **AI is free for everyone** — no token, tier, or featured-symbol
-gating (the `_ai_access` dependency only reads the tier for logging; it never
-403s). Abuse protection is three-layered:
+(`backend/app/api/ai.py`) run an OpenCode Go model (`mimo-v2.5`) against the
+technical indicators + news + fundamentals for a symbol and return a
+natural-language briefing. **AI is free for everyone** — no token, tier, or
+featured-symbol gating (the `_ai_access` dependency only reads the tier for
+logging; it never 403s). Abuse protection is three-layered:
 
 - **Per-IP rate limit:** `RATE_LIMIT_AI` (default **10 requests/minute/IP**).
 - **Heavy caching:** the result is cached per symbol per timeframe per day
@@ -24,23 +24,53 @@ The frontend auto-runs the AI OPINION widget after every analysis and streams
 the answer token-by-token; cached answers are replayed with the same
 progressive effect.
 
-## Provider & model chain
+## Provider & model
 
-- Endpoint: `https://opencode.ai/zen/v1` (OpenAI-compatible `/chat/completions`,
-  **free tier**). Do NOT use `/zen/go/v1` — it rejects `-free` model IDs.
-- Primary model: `deepseek-v4-flash-free` (`LLM_MODEL`).
-- **Fallback chain:** `LLM_FALLBACK_MODELS` (comma-separated free IDs, tried in
-  order on rate limit / outage / empty completion) — see `_model_chain()` in
-  `ai_analyzer.py`. Default:
-  `big-pickle,mimo-v2.5-free,ling-3.0-tiny-free,laguna-s-2.1-free,longcat-2.0-free,north-mini-code-free,nemotron-3-ultra-free`.
+- Endpoint: `https://opencode.ai/zen/go/v1` (OpenAI-compatible
+  `/chat/completions`, **OpenCode Go subscription** — ~$10/mo, flat model
+  pricing; usage limits at https://opencode.ai/docs/go/#usage-limits).
+- Model: `mimo-v2.5` (`LLM_MODEL`). It's the highest-usage Go model that works
+  in DE; `muse-spark-1.2-contributor` has higher limits but returns a 403
+  `RegionError` from Germany (Meta contributor-tier geo-block), and plain
+  OpenCode Zen `/zen/v1` needs per-token balance (401 when empty).
+- **No free tier / no fallback chain anymore.** The `-free` models plus the
+  `LLM_FALLBACK_MODELS` / `LLM_PAID_FALLBACK` config were removed — a request
+  failure surfaces as "temporarily unavailable" (never raises, never cached).
+  The 24h per-symbol cache bounds API spend: at most one LLM call per symbol
+  per day.
 - Config in `backend/.env`:
-  - `LLM_BASE_URL=https://opencode.ai/zen/v1`
+  - `LLM_BASE_URL=https://opencode.ai/zen/go/v1`
   - `LLM_API_KEY=<key>` (gitignored)
-  - `LLM_MODEL=deepseek-v4-flash-free`
-  - `LLM_FALLBACK_MODELS=...`
+  - `LLM_MODEL=mimo-v2.5`
 
 `backend/app/config.py` ships these as defaults; the local `.env` overrides
 them. Keep `.env` as the source of truth.
+
+## News feed & sentiment (`services/news_service.py`)
+
+The stock feed merges **Alpaca symbol news + Google News RSS** (via
+`AlpacaClient.get_news`) with **Finnhub `/company-news`** as a second outlet,
+then:
+
+- **Dedupes** (`dedupe_articles`): identical headline or URL always; headline
+  similarity ≥ 0.85 only on the same calendar day (stdlib `difflib`), so
+  republishes collapse but real follow-ups survive.
+- **Caps source dominance** (`cap_source`, max 2 per outlet, case-insensitive)
+  so a busy wire (Benzinga) can't fill the visible list.
+- **Scores each headline with VADER** (`compute_sentiment` → compound in
+  [-1, 1], handles negation/caps). `news_articles[].sentiment` drives the
+  widget's per-article chips AND is fed to the AI prompt context per article.
+- Sorts newest-first, then returns to the caller.
+
+Market-wide context is kept **separate** from the stock feed so it can't bias
+the stock's sentiment:
+
+- `GET /analysis/market-news` — Finnhub `news?category=general`, 12h cache,
+  VADER-scored the same way.
+- `GET /analysis/fear-greed` — CNN Fear & Greed index (unofficial dataviz
+  endpoint, needs the page-cookie handshake), 30 min cache, `{}` on failure.
+
+Both load independently of `/analysis` so they never block the slow report.
 
 ## Prompt construction — `services/ai_analyzer.py`
 
@@ -55,7 +85,8 @@ them. Keep `.env` as the source of truth.
   company_info=None)`:
   - Serializes indicators, overall verdict, options (if any), news
     sentiment, the **actual news articles** (capped at 8, summaries
-    truncated to 400 chars), and **market context** into a JSON `context` block.
+    truncated to 400 chars, each carrying its VADER `sentiment` score), and
+    **market context** into a JSON `context` block.
   - `market_data` (from `AlpacaClient.get_market_snapshot`) gives the model:
     live price, day change %, bid/ask, prev close, 52-week high/low, YTD change
     %. This lets the AI comment on where the price sits in its recent range.
@@ -68,10 +99,10 @@ them. Keep `.env` as the source of truth.
     empty/zero fields are filtered out.
 - `analyze(prompt, skip_ai=False)`:
   - POSTs to `{llm_base_url}/chat/completions` with `max_tokens: 8192`.
-  - Tries each model in the chain; on total failure returns the
-    "temporarily unavailable" fallback string (never raises).
+  - On any failure returns the "temporarily unavailable" fallback string
+    (never raises).
 - `analyze_stream(prompt, skip_ai=False)`:
-  - Same chain, `stream: true`; yields successive content strings.
+  - Single model, `stream: true`; yields successive content strings.
   - **Skips `reasoning_content` deltas** (the model's hidden thinking) — only
     the actual answer is streamed.
   - Mid-stream errors propagate (a partial answer must not be silently swapped
@@ -101,7 +132,7 @@ Response (non-streaming):
 {
   "symbol": "AAPL",
   "analysis": "## Summary\n**Recommendation: HOLD** ...\n\n----------------------------------------\n**This is not financial advice. AI can make/will make mistakes.**\n----------------------------------------",
-  "model": "deepseek-v4-flash-free",
+  "model": "mimo-v2.5",
   "analyzed_at": "2026-08-04T10:00:00+00:00",
   "news_sentiment": { "...": "..." },
   "news_articles": [

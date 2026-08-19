@@ -83,9 +83,10 @@ Typography: Space Grotesk (display), Inter (body), JetBrains Mono
 Both `s/[symbol]` and `options/[symbol]` are **gridstack widget grids**:
 
 - **Widget defs** live in `lib/layout.svelte.ts`: `ANALYSIS_WIDGETS`
-  (price-chart, vitals, indicator-checks, ai-opinion, news, company,
-  watchlist) and `OPTIONS_WIDGETS` (options-chain, payoff-explorer, greeks,
-  probability, pl-matrix, strategies, watchlist) — each with id/title/x/y/w/h.
+  (price-chart, vitals, indicator-checks, ai-opinion, news, fear-greed,
+  company, watchlist, insider, earnings, peers) and `OPTIONS_WIDGETS`
+  (options-chain, payoff-explorer, greeks, probability, pl-matrix,
+  strategies, watchlist) — each with id/title/x/y/w/h.
 - **`WidgetGrid.svelte`** initializes gridstack on the `defs`, dispatches
   drag/resize changes into `liveSizes` (`lib/layout.svelte.ts`), and persists
   positions to localStorage (`vexarium:layout:{view}`).

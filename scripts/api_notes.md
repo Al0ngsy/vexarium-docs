@@ -35,6 +35,16 @@ per-IP; slowapi's in-memory storage, not Redis).
   `SMERY`): the primary home-exchange listing, resolved keylessly via Yahoo
   search — `RNMBY → RHM.DE/XETRA`. The frontend shows a "VIEW MAIN LISTING"
   button. Cache key `company:v2:{symbol}` (12h TTL).
+- `GET /analysis/market-news` (Finnhub general news, 12h cache) and
+  `GET /analysis/fear-greed` (CNN Fear & Greed index, 30 min cache) are
+  **loaded independently of `/analysis`** — the news widget and market gauge
+  fetch them on their own so they never block the slow report. `fear-greed`
+  proxies CNN's unofficial dataviz endpoint (needs the page-cookie handshake;
+  plain requests get HTTP 418) and returns `{}` on failure.
+- News is **VADER**-scored per headline; `news_articles[].sentiment` carries
+  each article's score. The stock feed merges Alpaca + Google + Finnhub
+  `/company-news`, deduped (identical, or same-day ≥85% similar) with a
+  per-source cap (max 2 per outlet).
 
 ## Assets
 

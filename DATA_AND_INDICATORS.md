@@ -28,8 +28,10 @@ Methods you'll use:
 - `get_market_snapshot(symbol, df=None)` → live price, day change %, bid/ask,
   prev close + 52-week high/low + YTD change (from the bars). Fed to the
   AI as `market` context.
-- `get_news(symbol, limit=10)` → list of article dicts (Alpaca news with
-  Google News RSS fallback).
+- `get_news(symbol, limit=10)` → list of article dicts (Alpaca news merged
+  with Google News RSS). `news_service.fetch_news` adds Finnhub
+  `/company-news`, then **dedupes** and **source-caps** (max 2/outlet) before
+  VADER-scoring per article.
 - `get_option_contracts(...)`, `get_option_snapshot(...)`,
   `get_option_chain(...)` — options market data (see below).
 
@@ -52,9 +54,11 @@ if `REDIS_URL` is set, otherwise an in-memory `TTLCache`. TTLs:
 
 | Key | TTL | Notes |
 |-----|-----|-------|
-| `bars:{symbol}:{timeframe}` | 6h | Daily bars change at most once/day (intraday bars refresh with the same TTL). |
+| `bars:{symbol}:{timeframe}` | bar duration (1m→60s … 4h→4h); daily+ 6h | Intraday bars: Twelve Data first (real-time, no 15-min delay) → Alpaca (delayed) → Yahoo. Daily bars change at most once/day. |
+| `finnhub:{symbol}:{kind}` | 12h | Insider transactions / earnings history / peers (Finnhub enrichment widgets). |
 | `quote:{symbol}` | 5s | Seconds during market hours. |
 | `news:{symbol}` | 30 min | |
+| `fear-greed` | 30 min | CNN Fear & Greed index (server-side proxy; see CONVENTIONS for the cookie handshake). |
 | `optchain:{symbol}` | 15s | Options chain snapshot (indicative/delayed feed). |
 | `company:v2:{symbol}` | 12h | Company/ETF profile + fundamentals (see below). |
 | `ysearch:{q}` | 60s | Yahoo search autocomplete results (assets search). |

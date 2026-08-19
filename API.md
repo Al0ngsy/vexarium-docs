@@ -1,6 +1,6 @@
 # VEXARIUM — API Reference
 
-> **Auto-generated from the FastAPI OpenAPI schema** (`app.openapi()`, 24 paths). Do not hand-edit the tables — regenerate with `docs/scripts/generate_api_md.py`. Editorial notes (gating, caching, gotchas) live in `docs/scripts/api_notes.md`.
+> **Auto-generated from the FastAPI OpenAPI schema** (`app.openapi()`, 27 paths). Do not hand-edit the tables — regenerate with `docs/scripts/generate_api_md.py`. Editorial notes (gating, caching, gotchas) live in `docs/scripts/api_notes.md`.
 
 ## Health
 
@@ -25,6 +25,9 @@
 | POST | `/api/v1/analysis/ai` | ``AnalysisRequest`` → `—` | Ai Analysis |
 | POST | `/api/v1/analysis/ai/stream` | ``AnalysisRequest`` → `—` | Ai Analysis Stream |
 | GET | `/api/v1/analysis/bars/{symbol}` | ``symbol` + `?timeframe` + `?limit`` → `—` | Bars |
+| GET | `/api/v1/analysis/fear-greed` | → `—` | Fear Greed |
+| GET | `/api/v1/analysis/finnhub/{symbol}` | ``symbol`` → `—` | Finnhub Data |
+| GET | `/api/v1/analysis/market-news` | ``?limit`` → `—` | Market News |
 | POST | `/api/v1/analysis/options-strategies` | ``AnalysisRequest`` → `—` | Ai Options Strategies |
 
 ## Assets
@@ -127,7 +130,8 @@ Compact JSON skeletons from the OpenAPI components (values are placeholder examp
       "open": 0,
       "high": 0,
       "low": 0,
-      "close": 0
+      "close": 0,
+      "source": "string"
     }
   ],
   "indicator_series": [
@@ -154,7 +158,8 @@ Compact JSON skeletons from the OpenAPI components (values are placeholder examp
       "author": "string",
       "symbols": [
         "string"
-      ]
+      ],
+      "sentiment": "string"
     }
   ],
   "company": "string"
@@ -337,7 +342,8 @@ Compact JSON skeletons from the OpenAPI components (values are placeholder examp
   "author": "string",
   "symbols": [
     "string"
-  ]
+  ],
+  "sentiment": "string"
 }
 ```
 
@@ -546,7 +552,8 @@ Compact JSON skeletons from the OpenAPI components (values are placeholder examp
   "open": 0,
   "high": 0,
   "low": 0,
-  "close": 0
+  "close": 0,
+  "source": "string"
 }
 ```
 
@@ -704,6 +711,16 @@ per-IP; slowapi's in-memory storage, not Redis).
   `SMERY`): the primary home-exchange listing, resolved keylessly via Yahoo
   search — `RNMBY → RHM.DE/XETRA`. The frontend shows a "VIEW MAIN LISTING"
   button. Cache key `company:v2:{symbol}` (12h TTL).
+- `GET /analysis/market-news` (Finnhub general news, 12h cache) and
+  `GET /analysis/fear-greed` (CNN Fear & Greed index, 30 min cache) are
+  **loaded independently of `/analysis`** — the news widget and market gauge
+  fetch them on their own so they never block the slow report. `fear-greed`
+  proxies CNN's unofficial dataviz endpoint (needs the page-cookie handshake;
+  plain requests get HTTP 418) and returns `{}` on failure.
+- News is **VADER**-scored per headline; `news_articles[].sentiment` carries
+  each article's score. The stock feed merges Alpaca + Google + Finnhub
+  `/company-news`, deduped (identical, or same-day ≥85% similar) with a
+  per-source cap (max 2 per outlet).
 
 ## Assets
 

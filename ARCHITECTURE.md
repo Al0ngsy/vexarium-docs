@@ -101,9 +101,14 @@ frontend/src/
    `GET /api/v1/assets/search?q=...` (Alpaca asset list + keyless Yahoo merge).
 2. User opens a symbol → `s/[symbol]` → `POST /api/v1/analysis` (full report)
    + `GET /api/v1/analysis/bars/{symbol}?timeframe=` (chart data at a selectable
-   resolution: 1m/5m/15m/30m/1h/4h/1d/1w/1mo).
+   resolution: 1m/5m/15m/30m/1h/4h/1d/1w/1mo), plus the independent fast loads
+   `GET /analysis/finnhub/{symbol}`, `GET /analysis/market-news` and
+   `GET /analysis/fear-greed` — separate from the slow report so widget
+   content paints as it arrives.
 3. Backend: `validate_symbol` → `AlpacaClient.get_stock_bars` (OHLCV, cached
-   6h per `bars:{symbol}:{timeframe}`) → `IndicatorEngine.compute_all(df)` →
+   per `bars:{symbol}:{timeframe}`, TTL = bar duration for intraday, 6h for
+   daily+; intraday source chain = Twelve Data real-time → Alpaca → Yahoo) →
+   `IndicatorEngine.compute_all(df)` →
    `aggregate` verdict → chart series + news sentiment + company profile.
 4. The **whole analysis result is cached per symbol per timeframe per day**
    (daily bars → computed result changes at most once/day).

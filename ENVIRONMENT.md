@@ -67,10 +67,11 @@ yarn build                 # adapter-cloudflare build
 |-----|---------|
 | `ALPACA_API_KEY` / `ALPACA_SECRET_KEY` | Alpaca **paper** trading keys. |
 | `ALPACA_PAPER=true` | Paper trading. |
-| `LLM_BASE_URL=https://opencode.ai/zen/v1` | AI endpoint (OpenCode Zen, free tier). Do NOT use `/zen/go/v1` with `-free` models. |
-| `LLM_API_KEY` | OpenCode Zen key. |
-| `LLM_MODEL=deepseek-v4-flash-free` | Primary AI model. |
-| `LLM_FALLBACK_MODELS` | Comma-separated free fallback models tried in order on rate limit/outage. |
+| `LLM_BASE_URL=https://opencode.ai/zen/go/v1` | AI endpoint — **OpenCode Go subscription** (OpenAI-compatible). Not the free `/zen/v1` tier (no balance there). |
+| `LLM_API_KEY` | OpenCode key (Go subscription). |
+| `LLM_MODEL=mimo-v2.5` | AI model — highest-usage Go model usable in DE. |
+| `TWELVEDATA_API_KEY` | Real-time intraday bars (free at twelvedata.com, 8 req/min, 800/day). Empty → intraday bars use Alpaca (15-min delayed) + Yahoo. |
+| `FINNHUB_API_KEY` | Insider transactions / earnings / peers widgets (free at finnhub.io). Empty → those widgets show no data. |
 | `CORS_ORIGINS=http://localhost:5173` | Allowed origins, comma-separated. |
 | `REDIS_URL=redis://localhost:6379/0` | Redis cache + single-flight locks. Empty → in-memory TTL cache. |
 | `SENTRY_DSN` | Optional error tracking; empty disables. |
@@ -129,7 +130,7 @@ to everyone. The only Pro-gated endpoint is `GET /options/{symbol}/chance`
 ```bash
 cd backend
 env -u PYTHONPATH .venv/bin/python -m pytest tests/ -q
-# expect: 248 passed
+# expect: 268 passed
 ```
 
 The suite includes `tests/test_docs_sync.py` — it regenerates `docs/API.md`

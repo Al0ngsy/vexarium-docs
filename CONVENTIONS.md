@@ -34,6 +34,25 @@ Alpaca does not provide bar data for indices (SPX, NDX…). `POST /analysis
 data. Stocks and ETFs (AAPL, SPY) work fine. OTC/foreign ADRs (SMERY, RNMBY)
 fall back to Yahoo bars automatically.
 
+## CNN Fear & Greed needs the cookie handshake
+
+Plain requests to `production.dataviz.cnn.io/index/fearandgreed/graphdata`
+return **HTTP 418**. `services/fear_greed.py` first GETs the CNN markets page
+to collect cookies, then calls the dataviz URL with those cookies + a browser
+UA + Referer (verified working). It's an **unofficial endpoint** — it can
+break; the endpoint caches 30 min and returns `{}` on failure by design
+(erroring is NOT a bug to chase until CNN clearly changed something).
+
+## News: dedupe + source cap (don't revert to a raw merge)
+
+The stock feed merges Alpaca + Google + Finnhub `/company-news`, then
+**dedupes** (same headline/URL always; headline similarity ≥ 0.85 only within
+the same calendar day) and **caps any single source at 2 entries**
+(case-insensitive). Without the cap, Benzinga alone would fill the widget.
+Keep both when touching the news pipeline — they also protect the VADER
+aggregate from double-counting one story (Alpaca returns `created_at` as a
+`datetime` object, not a string — handle both).
+
 ## Options: volume / open interest / 0 DTE / delayed feed
 
 - Alpaca's free/paper tier does **not** provide option **volume** or **open
@@ -65,7 +84,8 @@ invalidating keys — intraday analysis would collide with daily otherwise.
 Indicators are computed from **daily** bars, and the whole analysis is cached
 per symbol per timeframe per day (24h). If you change indicator
 logic/verdicts and want to see it immediately, clear that cache key (or bump
-the TTL) while developing. Quotes are cached 5s; bars 6h; news 30m; AI 24h.
+the TTL) while developing. Quotes are cached 5s; bars = bar duration
+(intraday) / 6h (daily+); news 30m; AI 24h.
 
 ## Lightweight Charts v5 API
 
