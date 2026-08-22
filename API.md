@@ -309,7 +309,8 @@ Compact JSON skeletons from the OpenAPI components (values are placeholder examp
 {
   "contract_symbol": "string",
   "range_pct": 0,
-  "quantity": 0
+  "quantity": 0,
+  "dates": 0
 }
 ```
 
