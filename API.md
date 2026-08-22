@@ -104,6 +104,7 @@ Compact JSON skeletons from the OpenAPI components (values are placeholder examp
   "timeframe": "string",
   "current_price": "string",
   "day_change_pct": "string",
+  "ytd_change_pct": "string",
   "analyzed_at": "string",
   "overall": {
     "overall_verdict": "string",
@@ -188,6 +189,7 @@ Compact JSON skeletons from the OpenAPI components (values are placeholder examp
   "ceo_pay": "string",
   "market_cap": "string",
   "shares_outstanding": "string",
+  "revenue_ttm": "string",
   "pe_ratio": "string",
   "forward_pe": "string",
   "ps_ratio": "string",
