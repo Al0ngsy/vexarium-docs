@@ -54,7 +54,7 @@ backend + SvelteKit frontend, Professional Dashboard V2 visual design.
 - **Auth:** minimal self-built JWT auth (register/login/me). The frontend
   **login UI is currently removed** (getToken still feeds the AI stream); the
   backend auth API stays live. In dev, `DEV_FORCE_PRO=true` bypasses tier checks.
-- **Tests:** backend `274 passed`. Frontend gates: `yarn check`
+- **Tests:** backend `279 passed`. Frontend gates: `yarn check`
   (0 errors) + `yarn build`.
 
 Read the per-topic docs for the details that will actually let you keep going

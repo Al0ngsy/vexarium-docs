@@ -266,7 +266,7 @@ treat the credit budget as a hard ceiling.
 ## 7. Verification gates (run before declaring done)
 
 - Backend: `cd backend && env -u PYTHONPATH .venv/bin/python -m pytest tests/ -q`
-  (expect **274 passed**; bump doc numbers if tests are added, see
+  (expect **279 passed**; bump doc numbers if tests are added, see
   `CONVENTIONS.md`).
 - Frontend: `cd frontend && yarn check && yarn build`.
 - Endpoint shape changes: regenerate `docs/API.md`

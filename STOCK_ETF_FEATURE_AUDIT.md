@@ -14,6 +14,17 @@
 > features that are buildable with today's data sources, no new paid data
 > needed. The 16-indicator engine, the 24h-cached `/analysis` report, the
 > SSE quote stream and the keyless Yahoo fundamentals are the raw material.
+>
+> **STATUS UPDATE (Aug 22, 2026):** the first implementation round shipped.
+> Bugs B1-B6 are FIXED (BE `9699743`, FE `d1bea70`) and live in production.
+> Quick wins P1 (comparison overlay), P4 (pattern flags), P5 (key-stats
+> widget), P9 (fear-greed context) plus cleanups H17, H18, H19, H20, H22 and
+> the P5 support field (`ytd_change_pct`) shipped in FE `b9c8b13` / BE
+> `9699743`. Still open: P2/P3/P7/P8 (screener phase), P6, P10, P11, the
+> sense-check adaptations from section 1.3 (asset-type gating for
+> insider/earnings, vitals de-dup), and the remaining hardcoded-item notes
+> (H1-H16 except the fixed ones). Read the sections below as the state BEFORE
+> that round.
 
 ---
 
@@ -406,7 +417,7 @@ or FE-side math on two `/bars` calls; FE-side is fine for v1).
 ## 7. Verification gates (run before declaring done)
 
 - Backend: `cd backend && env -u PYTHONPATH .venv/bin/python -m pytest tests/ -q`
-  (expect **274 passed** as of Aug 2026; the docs still say 268, bump them).
+  (expect **279 passed** as of Aug 2026; the docs still say 274, bump them).
 - Frontend: `cd frontend && yarn check && yarn build`.
 - Endpoint shape changes: regenerate `docs/API.md`
   (`cd backend && .venv/bin/python ../docs/scripts/generate_api_md.py`) and
