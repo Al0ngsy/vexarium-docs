@@ -88,7 +88,7 @@ area — it's a cheap fix and prevents a future AI from trusting bad info.
   `env -u PYTHONPATH .venv/bin/python ...` or `env -u PYTHONPATH .venv/bin/uvicorn ...`.
 - **Yarn, never npm** for frontend commands: `yarn dev`, `yarn check`, `yarn build`.
 - **Backend tests:** `cd backend && env -u PYTHONPATH .venv/bin/python -m pytest tests/ -q`
-  (expect **268 passed**).
+  (expect **274 passed**).
 - **Frontend gates:** `yarn check` (0 errors) and `yarn build` (adapter-cloudflare).
 
 ## Workflow expectation

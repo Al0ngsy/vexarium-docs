@@ -130,7 +130,7 @@ to everyone. The only Pro-gated endpoint is `GET /options/{symbol}/chance`
 ```bash
 cd backend
 env -u PYTHONPATH .venv/bin/python -m pytest tests/ -q
-# expect: 268 passed
+# expect: 274 passed
 ```
 
 The suite includes `tests/test_docs_sync.py` — it regenerates `docs/API.md`

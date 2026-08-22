@@ -23,6 +23,8 @@ backend + SvelteKit frontend, Professional Dashboard V2 visual design.
 | [DATA_AND_INDICATORS.md](./DATA_AND_INDICATORS.md) | Data sources, caching, indicator registry, asset types.                                                                             |
 | [AI_ANALYSIS.md](./AI_ANALYSIS.md)                 | The AI pipeline, prompts, provider/model, streaming, news feed & sentiment. |
 | [OPTIONS_PAGE_REWORK.md](./OPTIONS_PAGE_REWORK.md) | **Implemented options-page rework** (Aug 2026): Alpaca options capabilities audit + beginner-first page design + phased build plan. |
+| [OPTIONS_FEATURE_AUDIT.md](./OPTIONS_FEATURE_AUDIT.md) | Working on the options workspace (`options/[symbol]`): current state, verified bugs, hardcoded/stub inventory, prioritized backlog. |
+| [STOCK_ETF_FEATURE_AUDIT.md](./STOCK_ETF_FEATURE_AUDIT.md) | Working on the stock/ETF analysis page (`s/[symbol]`): current state, verified bugs, widget sense-check, screener/Bloomberg-style backlog. |
 | [ENVIRONMENT.md](./ENVIRONMENT.md)                 | Env vars, setup, PYTHONPATH gotcha, dev tools.                                                                                      |
 | [DEPLOYMENT.md](./DEPLOYMENT.md)                   | Render/Neon/Upstash/Cloudflare Pages, Stripe, the deploy script.                                                                    |
 | [CONVENTIONS.md](./CONVENTIONS.md)                 | Coding conventions and non-obvious gotchas.                                                                                         |
@@ -52,7 +54,7 @@ backend + SvelteKit frontend, Professional Dashboard V2 visual design.
 - **Auth:** minimal self-built JWT auth (register/login/me). The frontend
   **login UI is currently removed** (getToken still feeds the AI stream); the
   backend auth API stays live. In dev, `DEV_FORCE_PRO=true` bypasses tier checks.
-- **Tests:** backend `268 passed`. Frontend gates: `yarn check`
+- **Tests:** backend `274 passed`. Frontend gates: `yarn check`
   (0 errors) + `yarn build`.
 
 Read the per-topic docs for the details that will actually let you keep going

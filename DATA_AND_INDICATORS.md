@@ -114,7 +114,7 @@ wait for the in-flight LLM call instead of firing duplicates.
 ### Extended indicators (11)
 
 ATR(14), ADX(25), OBV, VWAP, Ichimoku, CCI(20), Williams %R(14), MFI(14),
-ROC(10), PSAR, CMO(14). See `services/indicators/extended.py`. ATR/VWAP are
+ROC(12), PSAR, CMO(14). See `services/indicators/extended.py`. ATR/VWAP are
 timeframe-aware; the AI briefings reference them by name.
 
 ### Adding a new indicator
