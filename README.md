@@ -48,8 +48,10 @@ backend + SvelteKit frontend, Professional Dashboard V2 visual design.
   fundamentals fallback; **Wikipedia** for descriptions.
 - **Monetization:** **everything is free today** — all 16 indicators, the AI
   analysis (per-IP 10 req/min + 24h per-symbol cache, streamed via SSE), and
-  options analytics. The **only Pro-gated endpoint is the options
-  chance-of-profit estimate** (`/options/{symbol}/chance`). Stripe is fully
+  options analytics. **DEV NOTE (Aug 2026): all Pro gates are temporarily
+  removed during development** (chance-of-profit and the strategy AI are open
+  to everyone; `# DEV:` markers in code show what to re-add before launch).
+  Stripe is fully
   integrated (checkout + webhook) and ready for a future Pro tier.
 - **Auth:** minimal self-built JWT auth (register/login/me). The frontend
   **login UI is currently removed** (getToken still feeds the AI stream); the

@@ -394,7 +394,7 @@ or FE-side math on two `/bars` calls; FE-side is fine for v1).
   peers + company news; CNN covers market mood. Indices (SPX) 404 by
   design; SPY works and is the right benchmark symbol.
 - **Monetization context:** all 16 indicators and the AI briefing are free;
-  the only Pro-gated endpoint is `/options/{symbol}/chance`. The screener
+  **DEV (Aug 2026): Pro gates are temporarily removed during development**, so `/options/{symbol}/chance` and the options-strategy AI are currently open to everyone; `# DEV:` markers show the re-add points for launch. Before that, the only Pro-gated endpoint was `/options/{symbol}/chance`. The screener
   family (P2/P7/P8) is the natural next Pro candidate, but nothing in this
   doc requires gating to build.
 - **`last_price` semantics are loose:** the fabricated bid-as-last-price

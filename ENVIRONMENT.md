@@ -110,7 +110,7 @@ users/subscriptions. Tests force empty URLs so they stay hermetic.
 ## Dev Pro toggle / auth
 
 **Everything is free today** — all 16 indicators and the AI analysis are open
-to everyone. The only Pro-gated endpoint is `GET /options/{symbol}/chance`
+to everyone. **DEV (Aug 2026): Pro gates are temporarily removed during development** (`/options/{symbol}/chance` and the options-strategy AI are open to everyone); `# DEV:` comments mark the re-add points. Previously the only Pro-gated endpoint was `GET /options/{symbol}/chance`
 (403 for free/anonymous). To test the paywall locally:
 
 - Set `DEV_FORCE_PRO=true` in `backend/.env` to treat every user as Pro

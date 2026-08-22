@@ -171,7 +171,7 @@ fallback string — the frontend just renders it.
 ## Future
 
 - A per-user AI **daily limit** for the free tier is not yet enforced — today
-  AI is unlimited (rate-limited per-IP only). The only Pro-gated endpoint is
+  AI is unlimited (rate-limited per-IP only). **DEV (Aug 2026): Pro gates are temporarily removed during development**, so the options-strategies AI and `/options/{symbol}/chance` are open to everyone (`# DEV:` comments mark the re-add points for launch). Before that, the only Pro-gated endpoint was
   options chance-of-profit (`GET /options/{symbol}/chance`).
 - **Pro auto-update** — a scheduled daily AI refresh for Pro users would live
   in a background worker (not yet implemented).

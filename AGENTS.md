@@ -68,9 +68,11 @@ area — it's a cheap fix and prevents a future AI from trusting bad info.
 - **Monetization:** **all 16 indicators are free**; **AI analysis is free for
   everyone** (per-IP 10 req/min + 24h per-symbol cache; `POST /analysis/ai`
   and `/analysis/ai/stream` are open, no 403). The **only Pro-gated endpoint
-  is `GET /options/{symbol}/chance`** (403 for free/anonymous). Stripe billing
-  is integrated for a future Pro tier. `DEV_FORCE_PRO=true` in dev bypasses
-  tier checks; never in production.
+  is `GET /options/{symbol}/chance`**. **DEV NOTE (Aug 2026): all Pro gates are
+  temporarily removed during development** — `GET /options/{symbol}/chance`
+  and `POST /analysis/options-strategies` are open to everyone; the gates
+  carry `# DEV:` markers (BE) and comments (FE) to be re-added before launch.
+  Stripe billing is integrated for a future Pro tier.
 - **Auth:** minimal self-built JWT register/login/me. The frontend **login UI
   is currently removed** (see git history); auth state lives in
   `frontend/src/lib/auth.svelte.ts` (rune store — must keep the `.svelte.ts`

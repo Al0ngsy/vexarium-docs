@@ -97,8 +97,10 @@ wait for the in-flight LLM call instead of firing duplicates.
 
 - **All 16 indicators are free** — every analysis uses `create_pro_engine()`.
   There is no free/pro indicator split.
-- The **only Pro-gated endpoint** in the app is the options
-  chance-of-profit estimate (`GET /options/{symbol}/chance`, see below).
+- **DEV (Aug 2026): all Pro gates are temporarily removed during
+  development**; the options chance-of-profit estimate
+  (`GET /options/{symbol}/chance`, see below) and the options-strategy AI
+  are open to everyone. `# DEV:` comments mark the re-add points for launch.
 - In dev, flip `DEV_FORCE_PRO=true` in `backend/.env` to bypass tier checks.
 
 ### Core indicators (5)

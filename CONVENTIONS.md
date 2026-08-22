@@ -125,7 +125,9 @@ polluting history.
 - `middleware/tier_gating.py` decides free vs pro (`require_tier` dependency).
 - **All 16 indicators and the AI analysis are free** — no 403s on
   `/analysis`, `/analysis/ai`, or `/analysis/ai/stream`.
-- The **only Pro-gated endpoint is `GET /options/{symbol}/chance`**
+- **DEV (Aug 2026): all Pro gates are temporarily removed during
+  development**: `GET /options/{symbol}/chance` and the options-strategy AI
+  are open to everyone; `# DEV:` comments mark the re-add points for launch.
   (`require_tier("pro")` → 403 for free/anonymous).
 - Dev: `DEV_FORCE_PRO=true` in `backend/.env` treats everyone as Pro.
 - **Never** set `DEV_FORCE_PRO=true` in production.
