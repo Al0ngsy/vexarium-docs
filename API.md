@@ -1,6 +1,6 @@
 # VEXARIUM — API Reference
 
-> **Auto-generated from the FastAPI OpenAPI schema** (`app.openapi()`, 27 paths). Do not hand-edit the tables — regenerate with `docs/scripts/generate_api_md.py`. Editorial notes (gating, caching, gotchas) live in `docs/scripts/api_notes.md`.
+> **Auto-generated from the FastAPI OpenAPI schema** (`app.openapi()`, 28 paths). Do not hand-edit the tables — regenerate with `docs/scripts/generate_api_md.py`. Editorial notes (gating, caching, gotchas) live in `docs/scripts/api_notes.md`.
 
 ## Health
 
@@ -29,6 +29,7 @@
 | GET | `/api/v1/analysis/finnhub/{symbol}` | ``symbol`` → `—` | Finnhub Data |
 | GET | `/api/v1/analysis/market-news` | ``?limit`` → `—` | Market News |
 | POST | `/api/v1/analysis/options-strategies` | ``AnalysisRequest`` → `—` | Ai Options Strategies |
+| POST | `/api/v1/analysis/options-strategies/stream` | ``AnalysisRequest`` → `—` | Ai Options Strategies Stream |
 
 ## Assets
 
