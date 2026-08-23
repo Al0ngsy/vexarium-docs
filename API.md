@@ -91,7 +91,8 @@ Compact JSON skeletons from the OpenAPI components (values are placeholder examp
   "asset_type": "string",
   "timeframe": "string",
   "options_enabled": false,
-  "strike": "string"
+  "strike": "string",
+  "strategy": "string"
 }
 ```
 
