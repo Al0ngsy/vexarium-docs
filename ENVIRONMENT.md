@@ -75,6 +75,7 @@ yarn build                 # adapter-cloudflare build
 | `CORS_ORIGINS=http://localhost:5173` | Allowed origins, comma-separated. |
 | `REDIS_URL=redis://localhost:6379/0` | Redis cache + single-flight locks. Empty → in-memory TTL cache. |
 | `SENTRY_DSN` | Optional error tracking; empty disables. |
+| `LOG_LEVEL=info` | `debug` / `verbose` (alias for debug) / `info` / `warning` / `error` / `critical`. All app loggers live under the `vexarium` namespace (`app/logging.py`: `get_logger`); `verbose` reveals every important step and fine detail. Invalid values fall back to `info`. |
 | `DATABASE_URL=postgresql://vexarium:***@localhost:5432/vexarium` | Postgres (users/tiers/Stripe mapping). Empty → in-memory repos. Local Postgres needs `?ssl=disable` (no TLS); Neon/Render use TLS. |
 | `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | Stripe billing. Webhook must point at `<backend>/api/v1/billing/webhook`. |
 | `STRIPE_PRICE_ID` | Pro subscription Price ID (non-placeholder). |
