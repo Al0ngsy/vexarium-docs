@@ -51,7 +51,7 @@
 
 | Method | Path | Params / body → Response | Notes |
 |--------|------|---------------------------|-------|
-| GET | `/api/v1/options/{symbol}/strategies` | ``symbol` + `?sentiment` + `?strike` + `?expiration_gte` + `?expiration_lte` + `?dte`` → `StrategiesResponse` | Get Strategies |
+| GET | `/api/v1/options/{symbol}/strategies` | ``symbol` + `?sentiment` + `?strike` + `?expiration_gte` + `?expiration_lte` + `?dte` + `?timeframe`` → `StrategiesResponse` | Get Strategies |
 
 ## Portfolio
 
@@ -601,6 +601,7 @@ Compact JSON skeletons from the OpenAPI components (values are placeholder examp
 {
   "symbol": "string",
   "sentiment": "string",
+  "timeframe": "string",
   "strategies": [
     {
       "name": "string",
